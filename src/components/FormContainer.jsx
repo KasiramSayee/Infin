@@ -6,18 +6,21 @@ import PaymentForm from './forms/PaymentForm';
 import ConsentForm from './forms/ConsentForm';
 import { supabase } from '../supabase';
 
-const FormContainer = () => {
+const FormContainer = ({ onGoToLogin, onSignupSuccess }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     email: '',
     whatsapp: '',
-    language: 'Hindi',
+    language: 'English',
+    city: '',
+    pinCode: '',
     platform: '',
     partnerId: '',
     upiId: '',
     consentEarnings: false,
     consentLocation: false,
-    consentAutoPay: false
+    consentAutoPay: false,
+    password: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -39,11 +42,18 @@ const FormContainer = () => {
       const { error } = await supabase
         .from('workers')
         .insert([{
-            platform_id: formData.partnerId,
-            persona: formData.platform,
+            phone_number: formData.whatsapp,
+            platform: formData.platform,
+            platform_partner_id: formData.partnerId,
+            city: formData.city,
+            pin_code: formData.pinCode,
+            preferred_language: formData.language,
             upi_vpa: formData.upiId,
-            whatsapp_number: formData.whatsapp,
-            language_pref: formData.language
+            consent_earnings: formData.consentEarnings,
+            consent_gps: formData.consentLocation,
+            consent_autopay: formData.consentAutoPay,
+            email: formData.email,
+            password: formData.password
         }]);
 
       if (error) {
@@ -64,8 +74,8 @@ const FormContainer = () => {
   };
 
   return (
-    <div className="w-full md:w-1/2 p-10 flex flex-col items-center justify-center relative bg-[#222222]">
-      <div className="w-full max-w-md">
+    <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col items-center relative bg-[#222222] overflow-y-auto">
+      <div className="w-full max-w-md my-auto py-8">
         
         {/* Step Indicator */}
         <div className="mb-8 flex justify-between items-center px-2">
@@ -124,6 +134,7 @@ const FormContainer = () => {
                  isSubmitting={isSubmitting}
                  submitError={submitError}
                  submitSuccess={submitSuccess}
+                 onSuccessRedirect={onSignupSuccess || onGoToLogin}
                />
              )}
           </AnimatePresence>

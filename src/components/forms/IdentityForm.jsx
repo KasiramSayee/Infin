@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 
 const IdentityForm = ({ data, updateData, onNext }) => {
+  const isValid = data.email && data.password && data.whatsapp && data.city && data.pinCode;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -14,7 +16,7 @@ const IdentityForm = ({ data, updateData, onNext }) => {
       <div className="space-y-4 flex-1">
         <div>
           <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide">
-            Email Address
+            Email Address *
           </label>
           <input
             type="email"
@@ -26,8 +28,21 @@ const IdentityForm = ({ data, updateData, onNext }) => {
         </div>
 
         <div>
+          <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide">
+            Password *
+          </label>
+          <input
+            type="password"
+            placeholder="Create a password"
+            className="w-full bg-[#1F1F1F] border border-[#444] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0066FF] transition-colors"
+            value={data.password}
+            onChange={e => updateData({ password: e.target.value })}
+          />
+        </div>
+
+        <div>
            <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide">
-             WhatsApp Number
+             WhatsApp Number *
            </label>
            <div className="flex">
              <span className="bg-[#1F1F1F] border border-[#444] border-r-0 rounded-l-lg px-4 py-3 text-gray-400">
@@ -45,7 +60,38 @@ const IdentityForm = ({ data, updateData, onNext }) => {
 
         <div>
            <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide">
-             Preferred Language
+             City *
+           </label>
+           <select
+             className="w-full bg-[#1F1F1F] border border-[#444] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0066FF] transition-colors appearance-none"
+             value={data.city}
+             onChange={e => updateData({ city: e.target.value })}
+           >
+             <option value="" disabled>Select your city</option>
+             <option value="Chennai">Chennai</option>
+             <option value="Mumbai">Mumbai</option>
+             <option value="Delhi">Delhi</option>
+             <option value="Bengaluru">Bengaluru</option>
+           </select>
+        </div>
+
+        <div>
+           <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide">
+             Pin Code *
+           </label>
+           <input
+             type="text"
+             placeholder="e.g. 600001"
+             maxLength={6}
+             className="w-full bg-[#1F1F1F] border border-[#444] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0066FF] transition-colors"
+             value={data.pinCode}
+             onChange={e => updateData({ pinCode: e.target.value })}
+           />
+        </div>
+
+        <div>
+           <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide">
+             Preferred Language *
            </label>
            <select
              className="w-full bg-[#1F1F1F] border border-[#444] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0066FF] transition-colors appearance-none"
@@ -64,7 +110,12 @@ const IdentityForm = ({ data, updateData, onNext }) => {
 
       <button
         onClick={onNext}
-        className="mt-8 w-full bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+        disabled={!isValid}
+        className={`mt-8 w-full font-semibold py-3 px-4 rounded-lg transition-colors ${
+          isValid 
+          ? 'bg-[#0066FF] hover:bg-[#0052cc] text-white' 
+          : 'bg-[#333] text-gray-500 cursor-not-allowed'
+        }`}
       >
         Continue
       </button>

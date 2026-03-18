@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 
 const PaymentForm = ({ data, updateData, onNext, onBack }) => {
+  const isValid = data.upiId;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -14,7 +16,7 @@ const PaymentForm = ({ data, updateData, onNext, onBack }) => {
       <div className="space-y-6 flex-1 mt-2">
         <div>
            <label className="block text-xs text-gray-400 mb-2 ml-1 uppercase tracking-wide">
-             UPI ID (VPA)
+             UPI ID (VPA) *
            </label>
            <div className="relative">
              <input
@@ -54,7 +56,12 @@ const PaymentForm = ({ data, updateData, onNext, onBack }) => {
         </button>
         <button
           onClick={onNext}
-          className="w-2/3 bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+          disabled={!isValid}
+          className={`w-2/3 font-semibold py-3 px-4 rounded-lg transition-colors ${
+            isValid 
+            ? 'bg-[#0066FF] hover:bg-[#0052cc] text-white' 
+            : 'bg-[#333] text-gray-500 cursor-not-allowed'
+          }`}
         >
           Continue
         </button>
