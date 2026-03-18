@@ -12,6 +12,8 @@ const FormContainer = () => {
     email: '',
     whatsapp: '',
     language: 'Hindi',
+    city: '',
+    pinCode: '',
     platform: '',
     partnerId: '',
     upiId: '',
@@ -43,7 +45,9 @@ const FormContainer = () => {
             persona: formData.platform,
             upi_vpa: formData.upiId,
             whatsapp_number: formData.whatsapp,
-            language_pref: formData.language
+            language_pref: formData.language,
+            city: formData.city,
+            pin_code: formData.pinCode
         }]);
 
       if (error) {
@@ -64,8 +68,8 @@ const FormContainer = () => {
   };
 
   return (
-    <div className="w-full md:w-1/2 p-10 flex flex-col items-center justify-center relative bg-[#222222]">
-      <div className="w-full max-w-md">
+    <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col items-center relative bg-[#222222] overflow-y-auto">
+      <div className="w-full max-w-md my-auto py-8">
         
         {/* Step Indicator */}
         <div className="mb-8 flex justify-between items-center px-2">

@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 
 const WorkForm = ({ data, updateData, onNext, onBack }) => {
+  const isValid = data.platform && data.partnerId;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -15,7 +17,7 @@ const WorkForm = ({ data, updateData, onNext, onBack }) => {
         
         <div>
            <label className="block text-xs text-gray-400 mb-2 ml-1 uppercase tracking-wide">
-             Delivery Platform
+             Delivery Platform *
            </label>
            <div className="grid grid-cols-2 gap-3">
              <button
@@ -43,7 +45,7 @@ const WorkForm = ({ data, updateData, onNext, onBack }) => {
 
         <div>
           <label className="block text-xs text-gray-400 mb-1 ml-1 uppercase tracking-wide mt-4">
-            Platform Partner ID
+            Platform Partner ID *
           </label>
           <input
             type="text"
@@ -75,7 +77,12 @@ const WorkForm = ({ data, updateData, onNext, onBack }) => {
         </button>
         <button
           onClick={onNext}
-          className="w-2/3 bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+          disabled={!isValid}
+          className={`w-2/3 font-semibold py-3 px-4 rounded-lg transition-colors ${
+            isValid 
+            ? 'bg-[#0066FF] hover:bg-[#0052cc] text-white' 
+            : 'bg-[#333] text-gray-500 cursor-not-allowed'
+          }`}
         >
           Continue
         </button>

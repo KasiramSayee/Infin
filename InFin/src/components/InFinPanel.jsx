@@ -2,7 +2,7 @@ import { ShieldCheck, CloudRain, Sun, Activity } from 'lucide-react';
 
 const InFinPanel = () => {
   return (
-    <div className="w-full md:w-1/2 bg-gradient-to-br from-[#0066FF] to-[#0052cc] p-10 flex flex-col justify-between text-white relative overflow-hidden">
+    <div className="w-full md:w-1/2 bg-gradient-to-br from-[#0066FF] to-[#0052cc] p-10 flex flex-col justify-between text-white relative overflow-y-auto overflow-x-hidden min-h-full">
       {/* Background Decor */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-white opacity-5 rounded-full blur-[80px] pointer-events-none"></div>
       
