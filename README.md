@@ -67,7 +67,7 @@ conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed) [rounded
 = ₹58 / week
 ```
 
-Premium is collected weekly via Stripe. A **36-hour relaxation window** exists between the end of one policy week and the start of the next (i.e., a policy covering Day 1–7 can be renewed any time up to Day 8.5).
+Premium is collected weekly via Stripe/Razorpay. A **36-hour relaxation window** exists between the end of one policy week and the start of the next (i.e., a policy covering Day 1–7 can be renewed any time up to Day 8.5).
 
 ---
 
