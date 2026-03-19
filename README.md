@@ -308,7 +308,9 @@ All disruption events with gate scores, claims pipeline (pending â†’ approved â†
 # Clone the repo
 git clone https://github.com/your-org/infin.git
 cd infin
+```
 
+```bash
 # Install dependencies
 npm install
 
