@@ -4,6 +4,7 @@ import FormContainer from './components/FormContainer';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import AdminDashboard from './components/AdminDashboard';
+import PolicyPage from './components/PolicyPage';
 
 function App() {
   const [view, setView] = useState('login'); // 'login', 'signup', 'dashboard'
@@ -27,8 +28,12 @@ function App() {
     return <AdminDashboard user={user} onLogout={handleLogout} />;
   }
 
+  if (view === 'policy') {
+    return <PolicyPage user={user} onBack={() => setView('dashboard')} />;
+  }
+
   if (view === 'dashboard') {
-    return <Dashboard user={user} onLogout={handleLogout} />;
+    return <Dashboard user={user} onLogout={handleLogout} onGoToPolicy={() => setView('policy')} />;
   }
 
   if (view === 'login') {

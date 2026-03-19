@@ -68,6 +68,7 @@ const IdentityForm = ({ data, updateData, onNext }) => {
              onChange={e => updateData({ city: e.target.value })}
            >
              <option value="" disabled>Select your city</option>
+             <option value="Kolkata">Kolkata</option>
              <option value="Chennai">Chennai</option>
              <option value="Mumbai">Mumbai</option>
              <option value="Delhi">Delhi</option>
