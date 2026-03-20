@@ -11,7 +11,7 @@ We integrate automated event detection, data-driven validation, and instant digi
 ## Table of Contents
 
 - [Overview](#overview)
-- [The Problem](#the-problem)
+- [Problem](#problem)
 - [How It Works](#how-it-works)
   - [Engine 1 — Policy Pay](#engine-1--policy-pay)
   - [Engine 2 — Policy Claim](#engine-2--policy-claim)
