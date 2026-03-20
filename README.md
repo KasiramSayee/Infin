@@ -275,7 +275,7 @@ Instead of binary approval, WAS feeds into a three-stage decision engine:
 
 The WAS model continuously improves over time by learning from new behavioral data and fraud patterns. This allows the system to adapt to evolving spoofing techniques while maintaining fairness for genuine workers.
 
-### Why This Works
+#### Why This Works
 
 Fraudsters may spoof GPS location, but cannot easily replicate:
 
