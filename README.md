@@ -636,8 +636,5 @@ But they cannot easily fake:
 
 ### UI Screenshots
 <img width="1906" height="903" alt="image" src="https://github.com/user-attachments/assets/f0459168-e26d-44de-9e82-f4d4cc2aa11e" />
-<img width="1906" height="903" alt="image" src="https://github.com/user-attachments/assets/d011469d-3739-4fce-9253-2fc1d2e430b1" />
-![WhatsApp Image 2026-03-20 at 16 44 52](https://github.com/user-attachments/assets/6b852174-b474-4acc-a7f7-9bdbf6d75574)
-![WhatsApp Image 2026-03-20 at 16 44 52 (1)](https://github.com/user-attachments/assets/c3f68097-8271-4ffe-b5ae-e40621039899)
-
+![WhatsApp Image 2026-03-20 at 16 44 51](https://github.com/user-attachments/assets/a92cd465-f432-4b78-a263-757835134dfd)
 
