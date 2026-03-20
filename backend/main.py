@@ -65,8 +65,9 @@ async def get_policy_quote(user_id: str):
         print(f"[Engine 1] DP table result: {dp_res.data}")
         disruption_probability = dp_res.data[0]['dp_value'] if dp_res.data else 0.05
         
-        # 3. Fetch earnings history for the past 30 days
-        earnings_res = supabase.table("earnings_history").select("date", "earnings").eq("worker_id", user_id).order("date").limit(30).execute()
+        # 3. Fetch earnings history. Since it's hourly cumulative now, fetch enough rows and get max per day
+        # Supabase API limits might apply, but 300 should cover ~12 days of hourly pinging
+        earnings_res = supabase.table("earnings_history").select("date", "ts", "earnings").eq("worker_id", user_id).order("date", desc=True).limit(300).execute()
         
         expected_daily_earnings = 800 # fallback
         
@@ -74,7 +75,12 @@ async def get_policy_quote(user_id: str):
             # Calculate simple Exponential Moving Average using pandas
             df = pd.DataFrame(earnings_res.data)
             df['earnings'] = pd.to_numeric(df['earnings'])
-            ema = df['earnings'].ewm(span=7, adjust=False).mean()
+            
+            # Since earnings are cumulative per day, take the max earnings for each date
+            daily_df = df.groupby('date')['earnings'].max().reset_index()
+            daily_df = daily_df.sort_values('date') # Crucial: sort chronological for EMA
+            
+            ema = daily_df['earnings'].ewm(span=7, adjust=False).mean()
             if not ema.empty:
                 expected_daily_earnings = float(ema.iloc[-1])
                 
@@ -163,6 +169,9 @@ async def subscribe_policy(req: SubscribeRequest):
         print(f"[Engine 1] Error creating policy: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+from engine2 import router as engine2_router
+app.include_router(engine2_router)
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, ChevronRight, X, ExternalLink, ShieldCheck, Clock, AlertCircle, CloudLightning, Radio, CheckCircle, MapPin } from 'lucide-react';
+import { Shield, ChevronRight, X, ExternalLink, ShieldCheck, Clock, AlertCircle, CloudLightning, Radio, CheckCircle, MapPin, Mail, Phone } from 'lucide-react';
 import { supabase } from '../supabase';
 
 const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
@@ -9,36 +9,53 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
   const [modalMode, setModalMode] = useState('subscribe');
 
   const [activePolicy, setActivePolicy] = useState(null);
+  const [allClaims, setAllClaims] = useState([]);
   const [loadingPolicy, setLoadingPolicy] = useState(true);
   const [renewing, setRenewing] = useState(false);
   const [renewalFeedback, setRenewalFeedback] = useState(null);
   const [disruptionStage, setDisruptionStage] = useState(0); 
 
   useEffect(() => {
-    const fetchActivePolicy = async () => {
+    const fetchData = async () => {
       try {
         const id = user?.id || user?.worker_id;
         if (!id) return;
         
-        const { data, error } = await supabase
+        // Fetch Current Policy (Active or Pending)
+        const { data: activeData, error: activeErr } = await supabase
           .from('policies')
           .select('*')
           .eq('worker_id', id)
-          .eq('status', 'active')
+          .in('status', ['active', 'pending'])
           .single();
           
-        if (data && !error) {
-          setActivePolicy(data);
+        if (activeData && !activeErr) {
+          setActivePolicy(activeData);
         } else {
           setActivePolicy(null);
         }
+
+        // Fetch All Claims
+        const pols = await supabase.from('policies').select('id').eq('worker_id', id);
+        if (pols.data && pols.data.length > 0) {
+           const p_ids = pols.data.map(p => p.id);
+           const {data: claimsData, error: claimsErr} = await supabase
+             .from('claims')
+             .select('*')
+             .in('policy_id', p_ids)
+             .order('created_at', {ascending: false});
+             
+           if (claimsData && !claimsErr) {
+             setAllClaims(claimsData);
+           }
+        }
       } catch (err) {
-        console.error("Error fetching policy:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setLoadingPolicy(false);
       }
     };
-    fetchActivePolicy();
+    fetchData();
   }, [user]);
 
   const isPolicyActive = !!activePolicy;
@@ -50,7 +67,7 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
     const diffTime = nextDue - now;
     daysUntilReset = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   }
-  const canRenew = daysUntilReset <= 8;
+  const canRenew = isPolicyActive && activePolicy.cumulative_weeks_count < 2;
 
   const handleRenewPolicy = async () => {
     if (!activePolicy) return;
@@ -105,6 +122,40 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
         </button>
       </div>
 
+      {/* Notifications Area */}
+      {allClaims.length > 0 && (
+         <div className="max-w-4xl mx-auto mb-6">
+           {allClaims[0].status === 'pending' && (
+             <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4 flex items-start gap-4 animate-pulse">
+               <AlertCircle className="text-yellow-500 w-6 h-6 flex-shrink-0 mt-1"/>
+               <div>
+                 <h3 className="text-yellow-500 font-bold mb-1 border-b border-yellow-500/20 pb-1">Severe Weather Disruption Detected</h3>
+                 <p className="text-gray-300 text-sm">Your policy is currently tracking an ongoing disruption actively affecting your zone. No action is required from your side. We will evaluate your earnings and process any legitimate claims once the weather normalizes.</p>
+               </div>
+             </div>
+           )}
+           {allClaims[0].status === 'approved' && (
+             <div className="bg-green-500/20 border border-green-500/50 rounded-xl p-4 flex items-start gap-4">
+               <CheckCircle className="text-green-500 w-6 h-6 flex-shrink-0 mt-1"/>
+               <div>
+                 <h3 className="text-green-500 font-bold mb-1 border-b border-green-500/20 pb-1">Claim Approved & Paid!</h3>
+                 <p className="text-gray-300 text-sm">The recent extreme weather completely disrupted your operations. We have automatically credited a payout of <strong className="text-white text-base">₹{allClaims[0].final_payout}</strong> to your account. Stay safe out there!</p>
+               </div>
+             </div>
+           )}
+           {allClaims[0].status === 'rejected' && (
+             <div className="bg-gray-700/50 border border-gray-600 rounded-xl p-4 flex items-start gap-4">
+               <Shield className="text-gray-400 w-6 h-6 flex-shrink-0 mt-1"/>
+               <div>
+                 <h3 className="text-gray-300 font-bold mb-1 border-b border-gray-600 pb-1">Claim Evaluated: No Payout Required</h3>
+                 <p className="text-gray-400 text-sm">A recent weather disruption was evaluated, but your completed deliveries indicate your earnings did not drop below the critical 50% threshold. Excellent job pushing through the bad weather!</p>
+               </div>
+             </div>
+           )}
+         </div>
+      )}
+
+      {/* Main Content Area */}
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Welcome Card */}
@@ -158,12 +209,12 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Insurance Status Card with Weekly Reset */}
           <div className="bg-[#2B2B2B] p-6 rounded-2xl border border-white/5 shadow-lg flex flex-col justify-between relative overflow-hidden">
             {isPolicyActive && (
-              <div className="absolute top-0 left-0 w-full h-1 bg-green-500/50"></div>
+              <div className={`absolute top-0 left-0 w-full h-1 ${activePolicy?.status === 'pending' ? 'bg-yellow-500/50' : 'bg-green-500/50'}`}></div>
             )}
             
             <div>
@@ -172,11 +223,21 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
               </h3>
               <div className="flex items-center gap-3 mb-1">
                 <span className="relative flex h-3 w-3">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPolicyActive ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                  <span className={`relative inline-flex rounded-full h-3 w-3 ${isPolicyActive ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    activePolicy?.status === 'active' ? 'bg-green-400' : 
+                    activePolicy?.status === 'pending' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`}></span>
+                  <span className={`relative inline-flex rounded-full h-3 w-3 ${
+                    activePolicy?.status === 'active' ? 'bg-green-500' : 
+                    activePolicy?.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}></span>
                 </span>
-                <p className={`text-2xl font-bold ${isPolicyActive ? 'text-green-400' : 'text-red-400'}`}>
-                  {isPolicyActive ? 'Active' : 'Inactive'}
+                <p className={`text-2xl font-bold ${
+                  activePolicy?.status === 'active' ? 'text-green-400' : 
+                  activePolicy?.status === 'pending' ? 'text-yellow-400' : 'text-red-400'
+                }`}>
+                  {activePolicy?.status === 'active' ? 'Active' : 
+                   activePolicy?.status === 'pending' ? 'Pending' : 'Inactive'}
                 </p>
               </div>
             </div>
@@ -200,46 +261,58 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
               </div>
             </div>
           </div>
-
-          <div className="bg-[#2B2B2B] p-6 rounded-2xl border border-white/5 shadow-lg flex flex-col justify-between">
-            <div>
-              <h3 className="text-sm text-gray-400 font-medium mb-1 flex items-center gap-2">
-                Protected Income 
-                <span className="text-xs px-2 py-0.5 rounded bg-[#1A1A1A] text-gray-400 border border-white/10">Cap</span>
-              </h3>
-              <p className={`text-3xl font-bold mt-2 ${isPolicyActive ? 'text-white' : 'text-gray-500'}`}>
-                {isPolicyActive ? '₹2,400' : '₹0'}
-              </p>
-            </div>
-            <p className="text-xs text-gray-500 mt-4 pt-4 border-t border-white/5">
-              Weekly protection floor based on earnings.
-            </p>
-          </div>
-
-          <div className="bg-[#2B2B2B] p-6 rounded-2xl border border-white/5 shadow-lg flex flex-col justify-between">
-            <div>
-              <h3 className="text-sm text-gray-400 font-medium mb-1">Recent Claims</h3>
-              <div className="mt-3 flex items-center gap-2">
-                <AlertCircle className="text-gray-500 w-5 h-5" />
-                <p className="text-lg font-medium text-gray-500">
-                  {isPolicyActive && disruptionStage === 1 ? '1 Processing' : 
-                   isPolicyActive && disruptionStage === 2 ? '1 Finalised' : 
-                   'No active claims'}
-                </p>
+          
+          <div className="bg-[#2B2B2B] p-6 rounded-2xl border border-white/5 shadow-lg flex flex-col justify-between max-h-[350px]">
+            <div className="flex flex-col h-full">
+              <h3 className="text-sm text-gray-400 font-medium mb-3">Claim History</h3>
+              
+              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                {allClaims.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-32 text-gray-600">
+                    <Clock className="w-8 h-8 mb-2 opacity-20" />
+                    <p className="text-sm italic">No past claims found</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {allClaims.map((claim) => (
+                      <div key={claim.id} className="bg-[#1A1A1A] p-3 rounded-xl border border-white/5 flex justify-between items-center group hover:border-[#0066FF]/30 transition-colors">
+                        <div className="flex flex-col">
+                          <span className={`text-[10px] uppercase font-bold tracking-wider mb-1 ${
+                            claim.status === 'approved' ? 'text-green-500' :
+                            claim.status === 'pending' ? 'text-yellow-500' : 'text-gray-500'
+                          }`}>
+                            {claim.status}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {new Date(claim.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-bold ${claim.status === 'approved' ? 'text-white' : 'text-gray-600'}`}>
+                            {claim.status === 'approved' ? `₹${claim.final_payout}` : '—'}
+                          </p>
+                          <p className="text-[10px] text-gray-500">
+                            {claim.status === 'approved' ? 'Payout' : 'Evaluated'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-4 pt-4 border-t border-white/5">
-              Automated claims will appear here.
+            
+            <p className="text-[10px] text-gray-500 mt-4 pt-4 border-t border-white/5">
+              Automated claims are processed hourly.
             </p>
           </div>
         </div>
 
-        {/* Active Disruption Tracker - Always visible when insured, to show current stage */}
         {isPolicyActive && (
           <div className={`border rounded-2xl p-6 md:p-8 relative overflow-hidden shadow-2xl transition-all duration-500 ${
-            disruptionStage === 0 ? 'bg-[#2B2B2B] border-white/5 shadow-black/50' : 
-            disruptionStage === 1 ? 'bg-red-500/10 border-red-500/30 shadow-red-500/5' : 
-            'bg-green-500/10 border-green-500/30 shadow-green-500/5'
+            (disruptionStage === 1 || activePolicy?.status === 'pending') ? 'bg-red-500/10 border-red-500/30 shadow-red-500/5' : 
+            disruptionStage === 2 ? 'bg-green-500/10 border-green-500/30 shadow-green-500/5' :
+            'bg-[#2B2B2B] border-white/5 shadow-black/50'
           }`}>
             
             {disruptionStage === 1 && <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-[80px] pointer-events-none"></div>}
@@ -257,7 +330,7 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
                   {disruptionStage === 2 && <CheckCircle className="w-6 h-6 text-green-500" />}
                 </div>
                 <div>
-                  {disruptionStage === 0 && (
+                  {(disruptionStage === 0 && activePolicy?.status !== 'pending') && (
                     <>
                       <h3 className="text-xl font-bold text-gray-300">No Disruption Stage</h3>
                       <p className="text-gray-500 mt-2 max-w-lg leading-relaxed text-sm">
@@ -265,11 +338,11 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
                       </p>
                     </>
                   )}
-                  {disruptionStage === 1 && (
+                  {(disruptionStage === 1 || activePolicy?.status === 'pending') && (
                     <>
                       <h3 className="text-xl font-bold text-red-400 flex items-center gap-2">
                         <Radio className="w-5 h-5 animate-pulse" />
-                        Disruption phase is now active: Heavy Rain Detected
+                        Disruption phase is now active: High Intensity Event
                       </h3>
                       <p className="text-gray-300 mt-2 max-w-lg leading-relaxed text-sm">
                         Your zone is under disruption stage. Your automated claim process has been initiated.
@@ -292,6 +365,41 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
             </div>
           </div>
         )}
+
+        {/* Support & Help Desk */}
+        <div className="bg-[#2B2B2B] p-8 rounded-2xl border border-white/5 shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Support & Help Desk</h3>
+              <p className="text-gray-400 text-sm max-w-md">
+                Need assistance with your policy or have questions about a claim? Our support team is here to help you 24/7.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a 
+                href="mailto:support@infin.com" 
+                className="flex items-center gap-3 bg-[#1A1A1A] px-4 py-3 rounded-xl border border-white/5 hover:border-[#0066FF]/50 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#0066FF]/10 flex items-center justify-center text-[#0066FF] group-hover:bg-[#0066FF] group-hover:text-white transition-all">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-bold">Email Us</p>
+                  <p className="text-sm font-medium text-white">support@infin.com</p>
+                </div>
+              </a>
+              <div className="flex items-center gap-3 bg-[#1A1A1A] px-4 py-3 rounded-xl border border-white/5 hover:border-[#0066FF]/50 transition-colors group">
+                <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-bold">Call Support</p>
+                  <p className="text-sm font-medium text-white">1111 4444 3333</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Developer Testing Toggles (Not visible in prod) */}
         <div className="mt-12 p-5 bg-[#1A1A1A] rounded-xl border border-dashed border-[#444] flex flex-wrap gap-4 items-center">
