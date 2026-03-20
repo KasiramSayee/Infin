@@ -28,12 +28,6 @@ We integrate automated event detection, data-driven validation, and instant digi
 
 ---
 
-## Overview
-
-InFin is a zero-paperwork income insurance platform built for Swiggy and Zomato delivery partners across Indian cities. Workers pay a small, personalised weekly premium. When a disruption hits their zone — floods, bandhs, heatwaves, cyclones — InFin's system detects it automatically, validates it through 3 data-driven gates, and transfers a fair payout directly via UPI, with a WhatsApp notification. No claim forms. No waiting.
-
----
-
 ## The Problem
 
 | Pain Point | Reality |
@@ -527,7 +521,7 @@ But they cannot easily fake:
 
 ---
 
-### 🏁 Key Insight
+### Key Insight
 
 > InFin does not trust location.  
 > It trusts behavior across multiple independent systems.
