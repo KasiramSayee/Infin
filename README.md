@@ -42,21 +42,15 @@ We integrate automated event detection, data-driven validation, and instant digi
 
 ## How It Works
 
-### Engine 1 — Policy Pay
+### Engine 1:- Policy Pay - Expected Earnings Forecast (ML-Based)
 
-Each worker's weekly premium is computed individually from their verified platform earnings and their zone's historical disruption rate.
+Each worker's weekly premium is computed individually from their verified platform earnings and their zone's historical disruption rate. Instead of using a simple average, we predict each worker’s expected daily earnings using a time-series forecasting model.
 
-## Expected Earnings Forecast (ML-Based)
-
-Instead of using a simple average, InFin predicts each worker’s expected daily earnings using a time-series forecasting model.
-
-### Why this matters
 Gig worker income is highly variable:
 - Weekends have higher demand
 - Weather disruptions reduce earnings
 - Seasonal patterns affect delivery volume
-
-Using a static average would lead to inaccurate pricing and payouts.
+Therefore, using a static average would lead to inaccurate pricing and payouts.
 
 ### Model Approach
 We use a time-series model (Exponential Smoothing) trained on:
@@ -66,13 +60,9 @@ We use a time-series model (Exponential Smoothing) trained on:
 - Delivery volume trends
 - Seasonal effects (monsoon, festivals)
 
-### Output
-expected_daily_earnings = ML predicted value for next day
+**Output**: expected_daily_earnings = ML predicted value for next day
 
-### Data Window
-We use a rolling 4-week window as it provides the best balance between:
-- Recency (captures current behavior)
-- Stability (reduces noise)
+**Data Window**: We use a rolling 4-week window as it provides the best balance between recency (captures current behavior) & stability (reduces noise)
 
 ## Data Pipeline
 
@@ -87,11 +77,13 @@ weekly_premium = ROUND(
   × conflict_ratio
   × 1.15 / 0.65
 )
-
-conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed) [rounded to 1 decimal]
+```
+```
+conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed) 
 ```
 
-**Example — Rajan, Chennai**
+### Example
+— Rajan, Chennai
 - Daily earnings: ₹872
 - Disruption probability: 0.0615
 - Conflict ratio: 0.70
@@ -100,8 +92,6 @@ conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed) [rounded
 = ROUND(872 × 0.0615 × 0.70 × 1.15 / 0.65)
 = ₹58 / week
 ```
-
-Premium is collected weekly via Stripe/Razorpay. A **36-hour relaxation window** exists between the end of one policy week and the start of the next (i.e., a policy covering Day 1–7 can be renewed any time up to Day 8.5).
 
 ---
 
