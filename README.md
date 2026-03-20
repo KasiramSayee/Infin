@@ -531,7 +531,7 @@ All disruption events with gate scores, claims pipeline (pending â†’ approved â†
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/infin.git
+git clone https://github.com/KasiramSayee/Guideware.git
 cd infin
 ```
 
