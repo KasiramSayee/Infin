@@ -290,11 +290,12 @@ Workers who pay continuously for 24 weeks (6 months) never truly "lose" their pr
 | Scenario | Premium Return |
 |---|---|
 | No claims filed during full term | **80–90%** returned |
-| Claims made during term | **30–40%** returned, scaled by claim frequency |
+| Claims made during term | **10–20%** returned, scaled by claim frequency |
 
 **Loyalty counter reset rules:**
 - If a worker misses a weekly payment OR claims a payout during the term, the cumulative premium sum and transaction count reset to zero.
 - Only an unbroken 24-week streak qualifies for the end-of-term settlement.
+- A static 48 hr is given as a relaxation period after the insurance policy ends.
 
 Settlement is triggered automatically upon plan completion and paid via UPI.
 
