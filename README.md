@@ -527,6 +527,34 @@ All disruption events with gate scores, claims pipeline (pending → approved �
 
 ---
 
+## Support & Assistance
+
+To ensure transparency and user trust, InFin provides a dedicated support channel for workers to reach out in case of any issues or queries.
+
+While the platform is designed to be fully automated — from disruption detection to claim payouts — we understand that users may still need assistance in certain scenarios.
+
+### Contact Feature
+
+Users can directly contact the InFin support team through:
+
+- Email: support@infin.app
+- Phone: +91 9XXXXXXXXX
+
+This feature is accessible within the product interface, allowing workers to quickly raise concerns related to:
+
+- Policy subscription or payment issues
+- Claim validation or payout discrepancies
+- Loyalty bonus and settlement queries
+- Account or technical support
+
+### Why This Matters
+
+- Builds user trust in an automated insurance system
+- Provides a fallback mechanism when automation is unclear
+- Ensures human support for edge cases and disputes
+
+Even though InFin minimizes manual intervention, this feature ensures that users are never left without support.
+
 ## Getting Started
 
 ```bash
