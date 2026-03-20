@@ -28,57 +28,6 @@ We integrate automated event detection, data-driven validation, and instant digi
 
 ---
 
-```mermaid
-sequenceDiagram
-    autonumber
-    
-    %% Defining Participants with clearer labels
-    participant W as [ WORKER DEVICE ]
-    participant DVS as [ GATE 1: DVS ]
-    participant MSV as [ MULTI-SIGNAL LAYER ]
-    participant WAS as [ SCORING ENGINE ]
-    participant DE as [ DECISION ENGINE ]
-    participant P as [ PAYOUT / AUDIT ]
-
-    Note over W, P: --- START OF AUTHENTICATION FLOW ---
-
-    W->>DVS: Submit Claim (External API Trigger)
-    
-    rect rgb(240, 240, 240)
-        Note right of DVS: Validates Event Authenticity
-        DVS->>MSV: Proceed to Behavioral Analysis
-    end
-
-    box rgb(230, 245, 255) Verification Engines
-        participant MSV
-    end
-
-    par Mobility & Network
-        MSV->>MSV: Mobility Trace (GPS Path)
-        MSV->>MSV: Network Intel (Cell/WiFi)
-    and Integrity & Activity
-        MSV->>MSV: Device Integrity (Root/Mock)
-        MSV->>MSV: Platform Activity (Orders)
-    and Social
-        MSV->>MSV: Peer Graph (Zone Patterns)
-    end
-
-    MSV->>WAS: Compile Evidence
-    Note over WAS: WAS = (Mob 25% + Net 20% + Dev 20% + Plat 20% + Peer 15%)
-
-    WAS->>DE: Final Authenticity Score
-
-    alt Score > 80% (🟢 Approved)
-        DE->>P: Trigger Instant Payout
-    else Score 50% - 80% (🟡 Flagged)
-        DE->>P: Delay Payout / Add Verification
-    else Score < 50% (🔴 Blocked)
-        DE->>P: Reject Claim / Send to Audit
-    end
-
-    Note over W, P: --- END OF PROCESS ---
-
-```
 
 ## Problem
 
