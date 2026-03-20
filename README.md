@@ -206,12 +206,12 @@ Payout is not all-or-nothing. It compensates for what the worker **would have ea
 | Scenario | Payout |
 |---|---|
 | Worker didn't work | Floor amount (50% of disrupted expected income) |
-| Worked but earned below floor | `floor − actual_earned` (tops up to floor) |
+| Worked but earned below floor | `floor − actual_earned` (tops up to floor) + (0.1*floor) |
 | Worked and earned above floor | ₹0 (already protected) |
 
 **Example:**
 - Expected: ₹800, 6-hour event → disrupted expected = ₹700, floor = ₹350
-- If worker earned ₹100 → payout = ₹250 (total income = ₹350)
+- If worker earned ₹100 → payout = ₹ 250+35 (350*0.1) (total income = ₹285) [worker earns: 385]
 
 ---
 
