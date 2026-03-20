@@ -564,7 +564,7 @@ graph LR
 Active policy card, weekly cap remaining, live zone disruption alert banner (Supabase Realtime), and recent claims feed showing gate-by-gate pass/fail results.
 
 ### Claim Detail Modal
-DVS gauge breakdown, ZPCS peer count visualization, AEC pass/fail with plain-language reason, step-by-step payout math.
+DVS gauge breakdown, ZPCS peer count visualization, AEC pass/fail with plain-language reason, Anti-spoofing step-by-step payout math.
 
 ### Policy Subscription (3 steps)
 1. Phone OTP verification
