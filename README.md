@@ -95,7 +95,91 @@ conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed)
 
 ---
 
-### Engine 2 — Policy Claim
+### Engine 2:- Policy Claim - 3-Gate Claim Validation
+
+### Gate 1 — Disruption Validity Score (DVS)
+
+*Question: Did a real external disruption actually occur?*
+
+This gate evaluates only **external data sources** (weather APIs, AQI APIs, IMD alerts).  
+No worker data is considered at this stage.
+
+
+## DVS Formula
+
+DVS is computed as a weighted combination of:
+
+DVS = (source_agreement_score × 0.60)  
+   + (threshold_breach_score × 0.40)
+
+## Source Agreement Score (60%)
+
+Measures how many independent data sources confirm the disruption.
+
+| Sources Confirming | Score |
+|------------------|------|
+| Both sources confirm | 1.00 |
+| Only one source confirms | 0.50 |
+| Neither confirms | 0.00 |
+| Single-source trigger (e.g., AQI via CPCB) | 1.00 if API confirms |
+
+ Rationale: Multiple independent confirmations increase confidence that the event is real.
+
+
+## Threshold Breach Score (40%)
+
+Measures how strongly the observed value exceeds the predefined threshold.
+
+Each disruption type has a threshold stored in the system:
+
+- Rain ≥ 35 mm → disruption
+- AQI ≥ 300 → hazardous
+- Heat Index ≥ 42°C → extreme
+
+### Formula
+```
+threshold_breach_score =  
+min(1.00, ((actual_value − threshold_value) / threshold_value) × 2)
+```
+
+## Example Calculations
+
+| Trigger | Threshold | Actual | Breach Score | Interpretation |
+|--------|----------|--------|--------------|---------------|
+| Rainfall | 35 mm | 37 mm | 0.114 | Borderline |
+| Rainfall | 35 mm | 52 mm | 0.971 | Strong disruption |
+| Rainfall | 35 mm | 80 mm | 1.00 | Extreme event |
+
+ Small breaches → low confidence  
+ Large breaches → high confidence  
+
+
+## Final Decision
+
+**Pass condition:**
+
+DVS ≥ 0.70 → Valid disruption  
+DVS < 0.70 → Rejected (event considered weak or unconfirmed)
+
+---
+
+### Gate 2 — Zone Peer Comparison Score (ZPCS)
+
+Compares the claimant's delivery activity against all peers in the same pincode during the same window. If the disruption was real, most workers in the zone will show reduced activity.
+
+**Pass condition:** ≥ 35% of zone peers are affected (≥ 40% drop in their deliveries)
+
+---
+
+### Gate 3 — Activation Eligibility Check (AEC)
+
+A hard boolean check covering:
+- Was the policy bought **before** the event was publicly announced?
+- Is the worker outside the 6-hour refractory window for spontaneous events?
+- Is the event outside the 72-hour known-event exclusion window?
+
+**Pass condition:** AEC = TRUE
+
 
 No action required from the worker. The system runs daily and checks for disruptions automatically.
 
@@ -111,7 +195,6 @@ Payout is triggered and released only once the disruption parameter that caused 
 
 ---
 
-## 3-Gate Claim Validation
 
 ### Gate 1 — Disruption Validity Score (DVS)
 
