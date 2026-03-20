@@ -490,6 +490,7 @@ Built on **Supabase (Postgres)**.
 
 ---
 
+## Use Case diagram
 ```mermaid
 graph LR
     %% Primary Actors on the Left
