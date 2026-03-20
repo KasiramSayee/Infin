@@ -1,7 +1,7 @@
 # InFin - Income Protection for India's Gig Workers
 
 ## Abstract
-InFin uses real-time external data and behavioral analytics to detect disruption events and autonomously process claims without user intervention. The system employs a multi-stage validation pipeline consisting of a Disruption Validity Score (DVS), Zone Peer Comparison Score (ZPCS), and an Activation Eligibility Check (AEC) to ensure accurate and fraud-resistant claim verification. Personalized premiums are dynamically computed using machine learning models based on user earnings and regional risk. To improve trust and affordability, InFin introduces a hybrid insurance + chit-fund model (If the user continuously pays for 6 months and never got refunded then in order to build trust we refund large portion of their payings), where consistent users can recover a significant portion of their premiums if no claims are made. By combining automated event detection, data-driven validation, and instant UPI payouts, InFin delivers a scalable and worker-friendly alternative to traditional insurance.
+InFin uses real-time external data and behavioral analytics to detect disruption events and autonomously process claims without user intervention. The system employs a multi-stage validation pipeline consisting of a Disruption Validity Score (DVS), Zone Peer Comparison Score (ZPCS), Activation Eligibility Check (AEC) and Anti-spoofing is done to ensure accurate and fraud-resistant claim verification. Personalized premiums are dynamically computed using machine learning models based on user earnings and regional risk. To improve trust and affordability, InFin introduces a hybrid insurance + chit-fund model (If the user continuously pays for 6 months and never got refunded then in order to build trust we refund large portion of their payings), where consistent users can recover a significant portion of their premiums if no claims are made. By combining automated event detection, data-driven validation, and instant UPI payouts, InFin delivers a scalable and worker-friendly alternative to traditional insurance.
 
 ---
 
@@ -92,7 +92,7 @@ conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed)
 
 ---
 
-## Engine 2:- Policy Claim - 3-Gate Claim Validation
+## Engine 2:- Policy Claim - 4-Gate Claim Validation
 
 ### Gate 1 — Disruption Validity Score (DVS)
 
@@ -193,6 +193,98 @@ Payout is triggered and released only once the disruption parameter that caused 
 
 ---
 
+### Gate 4 — Anti-Spoofing & Fraud Detection (WAS)
+### Problem & Approach
+
+GPS spoofing is a major challenge in disruption-based insurance systems, where users may fake their location to appear inside a high-risk zone and trigger payouts.
+
+To address this, InFin moves beyond rule-based validation and introduces a machine learning–driven scoring system called the Worker Authenticity Score (WAS).
+
+Instead of relying on a single signal like GPS, WAS models each worker as a time-series of behavioral signals and performs anomaly detection across multiple independent dimensions. This makes the system robust against manipulation, as real-world behavior is significantly harder to fake than location data.
+
+### Worker Authenticity Score (WAS)
+
+WAS is computed as a weighted combination of multiple behavioral signals:
+```
+WAS = f(mobility_pattern, peer_consistency, network_behavior, platform_activity)
+```
+
+Each component is modeled using statistical learning and anomaly detection techniques. Even if one signal is spoofed, the overall system remains reliable.
+
+### Core Detection Layers (ML-Based)
+
+#### Mobility Pattern Analysis
+
+- Processes continuous GPS trajectories as sequential data
+- Evaluates:
+  - Speed consistency
+  - Route alignment
+  - Trajectory continuity
+- Detects impossible movements such as teleportation or synthetic paths
+
+#### Peer Consistency Modeling
+
+- Compares worker behavior with others in the same zone
+- Uses clustering and similarity scoring
+- Detects coordinated fraud patterns across multiple accounts
+
+#### Network Behavior Modeling
+
+- Models cell tower transitions and signal variance
+- Real-world networks show noisy, irregular patterns
+- Flags artificially stable signals typical of spoofed environments
+
+#### Platform Activity Modeling
+
+- Builds baseline profiles using historical delivery data
+- Tracks:
+  - Order acceptance rates
+  - Completion times
+  - Activity density
+- Detects unnatural inactivity during disruptions
+
+### Model Ensemble & Weighting
+
+The final WAS is computed using a weighted ensemble:
+
+- Mobility Pattern → 35%
+- Peer Consistency → 25%
+- Network Behavior → 20%
+- Platform Activity → 20%
+
+This ensures balanced decision-making across independent behavioral signals.
+
+### Decision System
+
+Instead of binary approval, WAS feeds into a three-stage decision engine:
+
+🟢 **Approved**
+- High authenticity score
+- Instant payout
+
+🟡 **Flagged**
+- Suspicious but not conclusive
+- Payout delayed (not denied)
+- Re-evaluated with additional data
+
+🔴 **Blocked**
+- Strong anomaly signals
+- Claim sent for audit and further verification
+
+### Continuous Learning
+
+The WAS model continuously improves over time by learning from new behavioral data and fraud patterns. This allows the system to adapt to evolving spoofing techniques while maintaining fairness for genuine workers.
+
+### Why This Works
+
+Fraudsters may spoof GPS location, but cannot easily replicate:
+
+- Real movement trajectories
+- Noisy network behavior
+- Consistent delivery patterns
+- Peer-aligned activity
+
+By combining these signals, InFin ensures strong fraud resistance without penalizing genuine users.
 
 ## Smart Payout Logic
 
@@ -516,113 +608,6 @@ graph LR
     style UC5 fill:#fff4dd,stroke:#d4a017,font-weight:bold
 ```
 
-## Anti-Spoofing & Fraud Detection Architecture
-
-### Problem & Approach
-
-GPS spoofing is a major challenge in disruption-based insurance systems, where users may fake their location to appear inside a high-risk zone and trigger payouts.
-
-To address this, InFin moves beyond rule-based validation and introduces a machine learning–driven scoring system called the Worker Authenticity Score (WAS).
-
-Instead of relying on a single signal like GPS, WAS models each worker as a time-series of behavioral signals and performs anomaly detection across multiple independent dimensions. This makes the system robust against manipulation, as real-world behavior is significantly harder to fake than location data.
-
-### Worker Authenticity Score (WAS)
-
-WAS is computed as a weighted combination of multiple behavioral signals:
-```
-WAS = f(mobility_pattern, peer_consistency, network_behavior, platform_activity)
-```
-
-Each component is modeled using statistical learning and anomaly detection techniques. Even if one signal is spoofed, the overall system remains reliable.
-
-### Core Detection Layers (ML-Based)
-
-#### Mobility Pattern Analysis
-
-- Processes continuous GPS trajectories as sequential data
-- Evaluates:
-  - Speed consistency
-  - Route alignment
-  - Trajectory continuity
-- Detects impossible movements such as teleportation or synthetic paths
-
-#### Peer Consistency Modeling
-
-- Compares worker behavior with others in the same zone
-- Uses clustering and similarity scoring
-- Detects coordinated fraud patterns across multiple accounts
-
-#### Network Behavior Modeling
-
-- Models cell tower transitions and signal variance
-- Real-world networks show noisy, irregular patterns
-- Flags artificially stable signals typical of spoofed environments
-
-#### Platform Activity Modeling
-
-- Builds baseline profiles using historical delivery data
-- Tracks:
-  - Order acceptance rates
-  - Completion times
-  - Activity density
-- Detects unnatural inactivity during disruptions
-
-### Model Ensemble & Weighting
-
-The final WAS is computed using a weighted ensemble:
-
-- Mobility Pattern → 35%
-- Peer Consistency → 25%
-- Network Behavior → 20%
-- Platform Activity → 20%
-
-This ensures balanced decision-making across independent behavioral signals.
-
-### Decision System
-
-Instead of binary approval, WAS feeds into a three-stage decision engine:
-
-🟢 **Approved**
-- High authenticity score
-- Instant payout
-
-🟡 **Flagged**
-- Suspicious but not conclusive
-- Payout delayed (not denied)
-- Re-evaluated with additional data
-
-🔴 **Blocked**
-- Strong anomaly signals
-- Claim sent for audit and further verification
-
-### System Flow
-
-1. External APIs detect disruption
-2. Gate 1 (DVS) validates event authenticity
-3. Behavioral data is collected as time-series signals
-4. WAS model performs anomaly detection
-5. Ensemble score is computed
-6. Decision engine classifies the claim
-7. Payout or audit is triggered
-
-### Continuous Learning
-
-The WAS model continuously improves over time by learning from new behavioral data and fraud patterns. This allows the system to adapt to evolving spoofing techniques while maintaining fairness for genuine workers.
-
-### Why This Works
-
-Fraudsters may spoof GPS location, but cannot easily replicate:
-
-- Real movement trajectories
-- Noisy network behavior
-- Consistent delivery patterns
-- Peer-aligned activity
-
-By combining these signals, InFin ensures strong fraud resistance without penalizing genuine users.
-
-### Key Insight
-
-> InFin does not trust location. It trusts learned behavior.
 
 ### UI Screenshots
 <img width="1906" height="903" alt="image" src="https://github.com/user-attachments/assets/f0459168-e26d-44de-9e82-f4d4cc2aa11e" />
