@@ -199,19 +199,75 @@ Payout is triggered and released only once the disruption parameter that caused 
 
 ## Smart Payout Logic
 
-Payout is not all-or-nothing. It compensates for what the worker **would have earned** minus what they **actually earned**, floored at 50% of their disrupted expected income.
+Payout is not all-or-nothing. It compensates for what the worker **would have earned** during the disruption minus what they **actually earned**, while ensuring a minimum income floor.
 
-**Weekly cap = 3× daily average earnings**
+---
+
+### Core Logic
+
+- **Expected Earnings (E)** = average of previous earnings  
+- **Disruption Duration (D)** = hours of disruption  
+- **Total Working Hours (T)** = Workers working window 
+
+
+disrupted_expected = (D / T) × E
+floor = 0.5 × disrupted_expected
+
+
+---
+
+### Payout Rules
 
 | Scenario | Payout |
 |---|---|
-| Worker didn't work | Floor amount (50% of disrupted expected income) |
-| Worked but earned below floor | `floor − actual_earned` (tops up to floor) + (0.1*floor) |
+| Worker didn't work | `floor` |
+| Worked but earned below floor | `(floor − actual_earned) + (0.1 × floor)` |
 | Worked and earned above floor | ₹0 (already protected) |
 
-**Example:**
-- Expected: ₹800, 6-hour event → disrupted expected = ₹700, floor = ₹350
-- If worker earned ₹100 → payout = ₹ 250+35 (350*0.1) (total income = ₹285) [worker earns: 385]
+---
+
+### Example
+
+- Expected (E) = ₹800  
+- Disruption = 6 hours  
+- Total working hours = 8  
+
+
+disrupted_expected = (6 / 8) × 800 = ₹600
+floor = 0.5 × 600 = ₹300
+
+
+---
+
+**Worker stays home:**
+
+Payout = ₹300
+Total income = ₹300
+
+
+---
+
+**Worker earns ₹100:**
+
+Payout = (300 − 100) + (0.1 × 300)
+= 200 + 30
+= ₹230
+
+Total income = 100 + 230 = ₹330
+
+
+---
+
+### Key Outcome
+
+- Worker at home → ₹300  
+- Worker who tries → ₹330  
+
+✅ Effort is rewarded  
+✅ Core payout logic remains unchanged  
+✅ Simple additive incentive  
+
+---
 
 ---
 
