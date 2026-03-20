@@ -607,6 +607,16 @@ This feature is accessible within the product interface, allowing workers to qui
 
 Even though InFin minimizes manual intervention, this feature ensures that users are never left without support.
 
+### UI Screenshots
+<img width="1906" height="903" alt="image" src="https://github.com/user-attachments/assets/f0459168-e26d-44de-9e82-f4d4cc2aa11e" />
+<img width="684" height="800" alt="image" src="https://github.com/user-attachments/assets/8656b666-a701-424a-afd4-3e50536af6e2" />
+<img width="1010" height="806" alt="image" src="https://github.com/user-attachments/assets/ace85e81-0bc7-429c-9927-d791329c1c81" />
+<img width="1063" height="797" alt="image" src="https://github.com/user-attachments/assets/dbeec07e-b904-4569-959e-370a6801e339" />
+<img width="1330" height="816" alt="image" src="https://github.com/user-attachments/assets/3fc49d6f-ee20-4f85-8c54-df40154064e0" />
+<img width="1085" height="806" alt="image" src="https://github.com/user-attachments/assets/bde1c201-186b-4aa7-a4c4-f855a00c24c2" />
+
+
+
 ## Getting Started
 
 ```bash
@@ -637,9 +647,4 @@ npm run dev
 
 ---
 
-### UI Screenshots
-<img width="1906" height="903" alt="image" src="https://github.com/user-attachments/assets/f0459168-e26d-44de-9e82-f4d4cc2aa11e" />
-<img width="1430" height="800" alt="image" src="https://github.com/user-attachments/assets/b00821f1-6a00-4188-965c-689f4c29414d" />
-<img width="931" height="799" alt="image" src="https://github.com/user-attachments/assets/003c131b-6b3a-40f6-bc1d-092a9ce7b207" />
-<img width="1155" height="788" alt="image" src="https://github.com/user-attachments/assets/dd0a7e1a-6dec-4c0b-8b3e-73df4c1484b6" />
 
