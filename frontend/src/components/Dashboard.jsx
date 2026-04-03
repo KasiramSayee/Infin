@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, ChevronRight, X, ExternalLink, ShieldCheck, Clock, AlertCircle, CloudLightning, Radio, CheckCircle, MapPin, Mail, Phone } from 'lucide-react';
 import { supabase } from '../supabase';
+import { API_BASE_URL } from '../config';
 
 const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
   const [showTerms, setShowTerms] = useState(false);
@@ -74,7 +75,7 @@ const Dashboard = ({ user, onLogout, onGoToPolicy }) => {
     setRenewing(true);
     setRenewalFeedback(null);
     try {
-      const res = await fetch('http://localhost:8000/api/v1/policy/renew', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/policy/renew`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ policy_id: activePolicy.id })

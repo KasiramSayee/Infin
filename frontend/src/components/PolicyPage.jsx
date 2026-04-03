@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, ChevronLeft, CreditCard, AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const PolicyPage = ({ user, onBack }) => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,7 @@ const PolicyPage = ({ user, onBack }) => {
         console.log('[PolicyPage] Fetching quote for user_id:', id, '| full user obj:', user);
         if (!id) throw new Error("No user ID found in session. Please log in again.");
 
-        const res = await fetch(`http://localhost:8000/api/v1/policy/quote?user_id=${id}`);
+        const res = await fetch(`${API_BASE_URL}/api/v1/policy/quote?user_id=${id}`);
         const data = await res.json();
         console.log('[PolicyPage] API response:', res.status, data);
         if (!res.ok) throw new Error(data?.detail || `API error ${res.status}`);
@@ -48,7 +49,7 @@ const PolicyPage = ({ user, onBack }) => {
     setLoading(true);
     setPaymentError(null);
     try {
-      const res = await fetch('http://localhost:8000/api/v1/policy/subscribe', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/policy/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
