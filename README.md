@@ -1,29 +1,26 @@
-<<<<<<< phase-3
 # InFin — Income Protection for India's Gig Workers
 
 > **Parametric income insurance for Swiggy & Zomato delivery partners.**
 > Automated payouts. Zero paperwork. No manual claims.
-=======
-# InFin - Income Protection for India's Gig Workers
 
-## Abstract
-InFin uses real-time external data and behavioral analytics to detect disruption events and autonomously process claims without user intervention. The system employs a multi-stage validation pipeline consisting of a Disruption Validity Score (DVS), Zone Peer Comparison Score (ZPCS), Activation Eligibility Check (AEC) and Anti-spoofing is done to ensure accurate and fraud-resistant claim verification. Personalized premiums are dynamically computed using machine learning models based on user earnings and regional risk. To improve trust and affordability, InFin introduces a hybrid insurance + chit-fund model (If the user continuously pays for 6 months and never got refunded then in order to build trust we refund large portion of their payings), where consistent users can recover a significant portion of their premiums if no claims are made. By combining automated event detection, data-driven validation, and instant UPI payouts, InFin delivers a scalable and worker-friendly alternative to traditional insurance.
->>>>>>> main
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js-black)](https://nextjs.org/)
+[![Powered by Supabase](https://img.shields.io/badge/Powered%20by-Supabase-3ECF8E)](https://supabase.com/)
+[![IRDAI Aligned](https://img.shields.io/badge/Designed%20in%20alignment%20with-IRDAI%20Sandbox-orange)](https://www.irdai.gov.in/)
 
 ---
 
 ## Table of Contents
 
-<<<<<<< phase-3
 - [Abstract](#abstract)
 - [Problem](#problem)
 - [How It Works](#how-it-works)
 - [Engine 1 — Policy Pay (Premium Calculation)](#engine-1--policy-pay)
 - [Engine 2 — Policy Claim (4-Gate Validation)](#engine-2--policy-claim)
-  - [Gate 1 — Disruption Validity Score (DVS)](#gate-1--disruption-validity-score-dvs)
-  - [Gate 2 — Zone Peer Comparison Score (ZPCS)](#gate-2--zone-peer-comparison-score-zpcs)
-  - [Gate 3 — Activation Eligibility Check (AEC)](#gate-3--activation-eligibility-check-aec)
-  - [Gate 4 — Worker Authenticity Score (WAS)](#gate-4--worker-authenticity-score-was)
+  - [Gate 1 — Disruption Validity Score (DVS)](#gate-1--disruption-validity-score-dvs)
+  - [Gate 2 — Zone Peer Comparison Score (ZPCS)](#gate-2--zone-peer-comparison-score-zpcs)
+  - [Gate 3 — Activation Eligibility Check (AEC)](#gate-3--activation-eligibility-check-aec)
+  - [Gate 4 — Worker Authenticity Score (WAS)](#gate-4--worker-authenticity-score-was)
 - [Ward Affinity System](#ward-affinity-system)
 - [Smart Payout Logic](#smart-payout-logic)
 - [Anti-Gaming Rules](#anti-gaming-rules)
@@ -31,90 +28,54 @@ InFin uses real-time external data and behavioral analytics to detect disruption
 - [Security Architecture](#security-architecture)
 - [End-to-End Claim Flow](#end-to-end-claim-flow)
 - [Policy Document](#policy-document)
-=======
-- [Overview](#overview)
-- [Problem](#problem)
-- [How It Works](#how-it-works)
-  - [Engine 1 — Policy Pay](#engine-1--policy-pay)
-  - [Engine 2 — Policy Claim](#engine-2--policy-claim)
-    - [4-Gate Claim Validation](#3-gate-claim-validation)
-    - [Smart Payout Logic](#smart-payout-logic)
-- [Anti-Gaming Rules](#anti-gaming-rules)
-- [Loyalty Bonus — Chit Fund Model](#loyalty-bonus--chit-fund-model)
-- [End-to-End Claim Flow](#end-to-end-claim-flow)
->>>>>>> main
 - [Database Schema](#database-schema)
 - [Tech Stack](#tech-stack)
 - [Product Screens](#product-screens)
 - [Getting Started](#getting-started)
 
-<<<<<<< phase-3
 ---
 
 ## Abstract
 
-InFin is a parametric income protection ecosystem designed for India’s gig economy, providing an automated safety net for delivery partners against hyper-local disruptions like floods, heatwaves, and strikes. To ensure long-term sustainability and worker trust, InFin operates on a Hybrid Insurance-Chit Fund Model: workers who maintain a 24-week claim-free streak recover up to most of their premiums, turning protection into a low-risk savings habit.
+InFin uses real-time external data and behavioural analytics to detect disruption events and autonomously process claims without user intervention. The system employs a multi-stage validation pipeline — **Disruption Validity Score (DVS)**, **Zone Peer Comparison Score (ZPCS)**, **Activation Eligibility Check (AEC)**, and **Worker Authenticity Score (WAS)** — to ensure accurate, fraud-resistant claim verification.
 
-The system is powered by two proprietary engines:
+Personalised premiums are dynamically computed using a **sigmoid-scaled ML model** based on predicted earnings and regional risk. To improve trust and affordability, InFin introduces a **hybrid insurance + chit-fund model**, where consistent users recover a significant portion of their premiums if no claims are made.
 
-Engine 1 (Policy Pay): Uses a time-series ML model to forecast earnings, applying a Sigmoid-scaled premium formula that dynamically adjusts risk while strictly capping weekly costs at ₹100 to ensure affordability for low-income earners.
-
-Engine 2 (Policy Claim): A 4-Gate validation pipeline that has evolved from broad city-level monitoring to hyper-local Ward-Based Analysis.
-
-### Core Innovations
-- Ward Affinity & Compensation Logic: The system identifies a worker's "Prime Ward" through historical data. If a disruption occurs, InFin calculates if the worker could have reasonably compensated for lost earnings by moving to an adjacent, unaffected "Best Ward." Payouts are triggered only when regional disruption makes such compensation impossible.
-
-- Gate 4: Anti-Spoofing via Cell Tower Triangulation: To combat GPS spoofing, InFin introduces a hardware-level validation layer. The system pulls Cell Tower IDs and signal strength via the Android API, performs an OpenCellID lookup, and cross-checks this physical network location against the user’s claimed Ward coordinates.
-
-- Smart Payouts & Anti-Gaming: Includes a Smart Payout Logic that guarantees an income floor and Anti-Gaming Rules (e.g., 6-hour refractory periods) to prevent "on-demand" policy purchases during active disasters.
-
-  ![WhatsApp Image 2026-04-04 at 22 01 43](https://github.com/user-attachments/assets/c90ea50c-d6bc-4221-8eb5-72fab305077c)
-
+By combining automated event detection, data-driven validation, and instant UPI payouts, InFin delivers a scalable, worker-friendly alternative to traditional insurance.
 
 ---
 
-=======
-
----
-
-
->>>>>>> main
 ## Problem
 
 | Pain Point | Reality |
 |---|---|
 | **Who it's for** | Swiggy / Zomato delivery partners in Indian cities |
 | **Daily earnings** | ₹700 – ₹1,100/day |
-<<<<<<< phase-3
 | **Risk** | Income drops to zero during floods, bandhs, heatwaves, and riots |
-=======
-| **Risk** | Income drops to zero during floods, bandhs, heatwaves and riots |
->>>>>>> main
 | **Why existing insurance fails** | Expensive, tiered, one-size-fits-all, requires paperwork the worker can't afford to do |
 
 ---
 
 ## How It Works
 
-<<<<<<< phase-3
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        INFIN SYSTEM                         │
-│                                                             │
-│  ┌──────────────┐              ┌────────────────────────┐   │
-│  │  ENGINE 1    │              │       ENGINE 2         │   │
-│  │  Policy Pay  │              │     Policy Claim       │   │
-│  │              │              │                        │   │
-│  │  ML Earnings │              │  Gate 1 → DVS          │   │
-│  │  Forecast    │              │  Gate 2 → ZPCS         │   │
-│  │      ↓       │              │  Gate 3 → AEC          │   │
-│  │  Sigmoid     │              │  Gate 4 → WAS          │   │
-│  │  Premium     │              │      ↓                 │   │
-│  │  Calc (≤₹100)│              │  Smart Payout          │   │
-│  │      ↓       │              │  via UPI               │   │
-│  │  Weekly UPI  │              │                        │   │
-│  │  Debit       │              │                        │   │
-│  └──────────────┘              └────────────────────────┘   │
+│                        INFIN SYSTEM                         │
+│                                                             │
+│  ┌──────────────┐              ┌────────────────────────┐   │
+│  │  ENGINE 1    │              │       ENGINE 2         │   │
+│  │  Policy Pay  │              │     Policy Claim       │   │
+│  │              │              │                        │   │
+│  │  ML Earnings │              │  Gate 1 → DVS          │   │
+│  │  Forecast    │              │  Gate 2 → ZPCS         │   │
+│  │      ↓       │              │  Gate 3 → AEC          │   │
+│  │  Sigmoid     │              │  Gate 4 → WAS          │   │
+│  │  Premium     │              │      ↓                 │   │
+│  │  Calc (≤₹100)│              │  Smart Payout          │   │
+│  │      ↓       │              │  via UPI               │   │
+│  │  Weekly UPI  │              │                        │   │
+│  │  Debit       │              │                        │   │
+│  └──────────────┘              └────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -125,16 +86,10 @@ Engine 2 (Policy Claim): A 4-Gate validation pipeline that has evolved from broa
 ### Expected Earnings Forecast (ML-Based)
 
 Each worker's weekly premium is computed individually from their verified platform earnings and their zone's historical disruption rate. Instead of a static average, InFin predicts each worker's expected daily earnings using a **time-series forecasting model**.
-=======
-## Engine 1:- Policy Pay - Expected Earnings Forecast (ML-Based)
-
-Each worker's weekly premium is computed individually from their verified platform earnings and their zone's historical disruption rate. Instead of using a simple average, we predict each worker’s expected daily earnings using a time-series forecasting model.
->>>>>>> main
 
 Gig worker income is highly variable:
 - Weekends have higher demand
 - Weather disruptions reduce earnings
-<<<<<<< phase-3
 - Seasonal patterns affect delivery volume (monsoon, festivals)
 
 ### Model Approach
@@ -160,7 +115,7 @@ The full premium formula applies the sigmoid to the **risk-adjusted raw premium*
 raw_premium = EDE × disruption_probability × conflict_ratio × 1.15 / 0.65
 
 weekly_premium = ROUND(
-  100 / (1 + e^(-k × (raw_premium - midpoint)))
+  100 / (1 + e^(-k × (raw_premium - midpoint)))
 )
 ```
 
@@ -173,17 +128,17 @@ conflict_ratio = workers_paid_past_4_weeks / workers_who_claimed
 ### Example — Rajan, Chennai
 
 ```
-EDE               = ₹872
-disruption_prob   = 0.0615
-conflict_ratio    = 0.70
-k                 = 0.005
-midpoint          = ₹50 (applied to raw_premium space — not EDE)
+EDE               = ₹872
+disruption_prob   = 0.0615
+conflict_ratio    = 0.70
+k                 = 0.005
+midpoint          = ₹50 (applied to raw_premium space — not EDE)
 
 raw_premium = ROUND(872 × 0.0615 × 0.70 × 1.15 / 0.65)
-            = ₹58
+            = ₹58
 
 weekly_premium = ROUND(100 / (1 + e^(-0.005 × (58 - 50))))
-              = ₹54/week
+              = ₹54/week
 ```
 
 ---
@@ -196,39 +151,39 @@ All claims are fully automated. The worker does nothing. The system runs daily, 
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│               4-GATE VALIDATION PIPELINE                 │
-│                                                          │
-│  External APIs detect disruption                         │
-│          │                                               │
-│          ▼                                               │
-│  ┌───────────────┐                                       │
-│  │    GATE 1     │  DVS ≥ 0.70?                         │
-│  │      DVS      │  "Was the disruption real?"           │
-│  └──────┬────────┘                                       │
-│    PASS │  FAIL → Rejected                               │
-│         ▼                                                │
-│  ┌───────────────┐                                       │
-│  │    GATE 2     │  ZPCS ≥ 0.35?                        │
-│  │     ZPCS      │  "Was it zone-wide?"                  │
-│  └──────┬────────┘                                       │
-│    PASS │  FAIL → Rejected                               │
-│         ▼                                                │
-│  ┌───────────────┐                                       │
-│  │    GATE 3     │  AEC = TRUE?                         │
-│  │      AEC      │  "Was the event covered?"             │
-│  └──────┬────────┘                                       │
-│    PASS │  FAIL → Rejected                               │
-│         ▼                                                │
-│  ┌───────────────┐                                       │
-│  │    GATE 4     │  WAS = Approved / Flagged?            │
-│  │      WAS      │  "Is the worker genuine?"             │
-│  └──────┬────────┘                                       │
-│    PASS │  BLOCKED → Audit                               │
-│         ▼                                                │
-│  Disruption parameter returns to normal                  │
-│          │                                               │
-│          ▼                                               │
-│  Payout calculated → UPI transfer → WhatsApp notify      │
+│               4-GATE VALIDATION PIPELINE                 │
+│                                                          │
+│  External APIs detect disruption                         │
+│          │                                               │
+│          ▼                                               │
+│  ┌───────────────┐                                       │
+│  │    GATE 1     │  DVS ≥ 0.70?                         │
+│  │      DVS      │  "Was the disruption real?"           │
+│  └──────┬────────┘                                       │
+│    PASS │  FAIL → Rejected                               │
+│         ▼                                                │
+│  ┌───────────────┐                                       │
+│  │    GATE 2     │  ZPCS ≥ 0.35?                        │
+│  │     ZPCS      │  "Was it zone-wide?"                  │
+│  └──────┬────────┘                                       │
+│    PASS │  FAIL → Rejected                               │
+│         ▼                                                │
+│  ┌───────────────┐                                       │
+│  │    GATE 3     │  AEC = TRUE?                         │
+│  │      AEC      │  "Was the event covered?"             │
+│  └──────┬────────┘                                       │
+│    PASS │  FAIL → Rejected                               │
+│         ▼                                                │
+│  ┌───────────────┐                                       │
+│  │    GATE 4     │  WAS = Approved / Flagged?            │
+│  │      WAS      │  "Is the worker genuine?"             │
+│  └──────┬────────┘                                       │
+│    PASS │  BLOCKED → Audit                               │
+│         ▼                                                │
+│  Disruption parameter returns to normal                  │
+│          │                                               │
+│          ▼                                               │
+│  Payout calculated → UPI transfer → WhatsApp notify      │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -244,7 +199,7 @@ This gate evaluates **only external data sources** — weather APIs, AQI APIs, I
 
 ```
 DVS = (source_agreement_score × 0.60)
-    + (threshold_breach_score × 0.40)
+    + (threshold_breach_score × 0.40)
 ```
 
 #### Source Agreement Score (60%)
@@ -272,110 +227,10 @@ threshold_breach_score = min(1.00, ((actual_value − threshold_value) / thresho
 
 | Trigger | Threshold | Actual | Breach Score | Interpretation |
 |---|---|---|---|---|
-=======
-- Seasonal patterns affect delivery volume
-Therefore, using a static average would lead to inaccurate pricing and payouts.
-
-### Model Approach
-We use a time-series model (Exponential Smoothing) trained on:
-
-- Last 4 weeks of earnings history
-- Day-of-week patterns (weekday vs weekend)
-- Delivery volume trends
-- Seasonal effects (monsoon, festivals)
-
-**Output**: expected_daily_earnings = ML predicted value for next day
-
-**Data Window**: We use a rolling 4-week window as it provides the best balance between recency (captures current behavior) & stability (reduces noise)
-
-## Data Pipeline
-
-1. Earnings data is collected per worker and stored in `earnings_history`
-2. A weekly job trains the forecasting model per worker
-3. Engine 1 uses this predicted value to compute weekly premium
-
-```
-weekly_premium = ROUND(
-  expected_daily_earnings
-  × disruption_probability
-  × conflict_ratio
-  × 1.15 / 0.65
-)
-```
-```
-conflict_ratio = (workers paid in past 4 weeks) / (workers who claimed) 
-```
-
-### Example
-— Rajan, Chennai
-- Daily earnings: ₹872
-- Disruption probability: 0.0615
-- Conflict ratio: 0.70
-
-```
-= ROUND(872 × 0.0615 × 0.70 × 1.15 / 0.65)
-= ₹58 / week
-```
-
----
-
-## Engine 2:- Policy Claim - 4-Gate Claim Validation
-
-### Gate 1 — Disruption Validity Score (DVS)
-
-*Question: Did a real external disruption actually occur?*
-
-This gate evaluates only **external data sources** (weather APIs, AQI APIs, IMD alerts).  
-No worker data is considered at this stage.
-
-
-### DVS Formula
-
-DVS is computed as a weighted combination of:
-
-DVS = (source_agreement_score × 0.60)  
-   + (threshold_breach_score × 0.40)
-
-### Source Agreement Score (60%)
-
-Measures how many independent data sources confirm the disruption.
-
-| Sources Confirming | Score |
-|------------------|------|
-| Both sources confirm | 1.00 |
-| Only one source confirms | 0.50 |
-| Neither confirms | 0.00 |
-| Single-source trigger (e.g., AQI via CPCB) | 1.00 if API confirms |
-
- Rationale: Multiple independent confirmations increase confidence that the event is real.
-
-
-### Threshold Breach Score (40%)
-
-Measures how strongly the observed value exceeds the predefined threshold.
-
-Each disruption type has a threshold stored in the system:
-
-- Rain ≥ 35 mm → disruption
-- AQI ≥ 300 → hazardous
-- Heat Index ≥ 42°C → extreme
-
-### Formula
-```
-threshold_breach_score =  
-min(1.00, ((actual_value − threshold_value) / threshold_value) × 2)
-```
-
-### Example Calculations
-
-| Trigger | Threshold | Actual | Breach Score | Interpretation |
-|--------|----------|--------|--------------|---------------|
->>>>>>> main
 | Rainfall | 35 mm | 37 mm | 0.114 | Borderline |
 | Rainfall | 35 mm | 52 mm | 0.971 | Strong disruption |
 | Rainfall | 35 mm | 80 mm | 1.00 | Extreme event |
 
-<<<<<<< phase-3
 **Pass condition:** `DVS ≥ 0.70`
 
 ---
@@ -395,32 +250,11 @@ ZPCS = (workers_with_≥40%_activity_drop) / (total_active_workers_in_zone)
 > **Threshold Justification:** The 0.35 threshold was selected to balance two failure modes: setting it too high causes false negatives (legitimate claims from moderate disruptions get rejected); setting it too low causes false positives (fraudulent claims pass in partially-affected zones). During pilot, this will be tuned using observed disruption-activity correlation data. Until then, 35% represents a conservative but worker-fair baseline.
 
 > **Key distinction from Gate 4:** ZPCS validates the *event* — it doesn't look at individual behaviour. Gate 4 validates the *individual worker*.
-=======
- Small breaches → low confidence  
- Large breaches → high confidence  
-
-
-### Final Decision
-
-**Pass condition:**
-
-DVS ≥ 0.70 → Valid disruption  
-DVS < 0.70 → Rejected (event considered weak or unconfirmed)
-
----
-
-### Gate 2 — Zone Peer Comparison Score (ZPCS)
-
-Compares the claimant's delivery activity against all peers in the same pincode during the same window. If the disruption was real, most workers in the zone will show reduced activity.
-
-**Pass condition:** ≥ 35% of zone peers are affected (≥ 40% drop in their deliveries)
->>>>>>> main
 
 ---
 
 ### Gate 3 — Activation Eligibility Check (AEC)
 
-<<<<<<< phase-3
 **Question:** Was this event actually covered under the policy?
 
 A hard boolean check covering:
@@ -449,31 +283,31 @@ WAS = f(mobility_pattern, peer_consistency, network_behavior, platform_activity)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                  WAS COMPUTATION                        │
-│                                                         │
-│  ┌─────────────────────────┐   Weight                  │
-│  │  Mobility Pattern       │   35%  ← Ward Affinity    │
-│  │  (Ward time vs history) │        feeds here         │
-│  └─────────────────────────┘                           │
-│  ┌─────────────────────────┐   Weight                  │
-│  │  Peer Consistency       │   25%  ← Cluster match    │
-│  │  (vs zone workers)      │        vs zone peers      │
-│  └─────────────────────────┘                           │
-│  ┌─────────────────────────┐   Weight                  │
-│  │  Network Behavior       │   20%  ← Cell tower       │
-│  │  (Cell tower signals)   │        fingerprint        │
-│  └─────────────────────────┘                           │
-│  ┌─────────────────────────┐   Weight                  │
-│  │  Platform Activity      │   20%  ← Gig platform     │
-│  │  (Order patterns)       │        API logs           │
-│  └─────────────────────────┘                           │
-│                    │                                    │
-│                    ▼                                    │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │  🟢 Approved → Instant payout                   │   │
-│  │  🟡 Flagged  → Delayed, re-evaluated            │   │
-│  │  🔴 Blocked  → Audit, no payout                 │   │
-│  └─────────────────────────────────────────────────┘   │
+│                  WAS COMPUTATION                        │
+│                                                         │
+│  ┌─────────────────────────┐   Weight                  │
+│  │  Mobility Pattern       │   35%  ← Ward Affinity    │
+│  │  (Ward time vs history) │        feeds here         │
+│  └─────────────────────────┘                           │
+│  ┌─────────────────────────┐   Weight                  │
+│  │  Peer Consistency       │   25%  ← Cluster match    │
+│  │  (vs zone workers)      │        vs zone peers      │
+│  └─────────────────────────┘                           │
+│  ┌─────────────────────────┐   Weight                  │
+│  │  Network Behavior       │   20%  ← Cell tower       │
+│  │  (Cell tower signals)   │        fingerprint        │
+│  └─────────────────────────┘                           │
+│  ┌─────────────────────────┐   Weight                  │
+│  │  Platform Activity      │   20%  ← Gig platform     │
+│  │  (Order patterns)       │        API logs           │
+│  └─────────────────────────┘                           │
+│                    │                                    │
+│                    ▼                                    │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  🟢 Approved → Instant payout                   │   │
+│  │  🟡 Flagged  → Delayed, re-evaluated            │   │
+│  │  🔴 Blocked  → Audit, no payout                 │   │
+│  └─────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -532,39 +366,39 @@ To power Gate 4's Mobility Pattern layer, InFin implements a **lightweight time-
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│               WARD AFFINITY PIPELINE                     │
-│                                                          │
-│  Order Accepted                                          │
-│       │                                                  │
-│       ▼                                                  │
-│  GPS Sample (every 30–60s)                               │
-│       │                                                  │
-│       ▼                                                  │
-│  (lat, lon) → ward_id                                    │
-│  [Geohash / GeoJSON polygon lookup]                      │
-│       │                                                  │
-│       ▼                                                  │
-│  On-Device Aggregation                                   │
-│  ┌────────────────────────────┐                          │
-│  │  if current_ward           │                          │
-│  │    == last_ward:           │                          │
-│  │    ward_time[ward] += Δt   │                          │
-│  │  else:                     │                          │
-│  │    last_ward = current_ward│                          │
-│  └────────────────────────────┘                          │
-│       │                                                  │
-│       ▼  (every 5–10 min OR end of order)                │
-│  Compressed Transmission to Server                       │
-│  {                                                       │
-│    "worker_id": "uuid",                                  │
-│    "ward_time": {                                        │
-│      "ward_Adyar": 1200,                                 │
-│      "ward_Mylapore": 800,                               │
-│      "ward_Velachery": 300                               │
-│    }                                                     │
-│  }                                                       │
-│       │                                                  │
-│  Order Completed → Tracking stops                        │
+│               WARD AFFINITY PIPELINE                     │
+│                                                          │
+│  Order Accepted                                          │
+│       │                                                  │
+│       ▼                                                  │
+│  GPS Sample (every 30–60s)                               │
+│       │                                                  │
+│       ▼                                                  │
+│  (lat, lon) → ward_id                                    │
+│  [Geohash / GeoJSON polygon lookup]                      │
+│       │                                                  │
+│       ▼                                                  │
+│  On-Device Aggregation                                   │
+│  ┌────────────────────────────┐                          │
+│  │  if current_ward           │                          │
+│  │    == last_ward:           │                          │
+│  │    ward_time[ward] += Δt   │                          │
+│  │  else:                     │                          │
+│  │    last_ward = current_ward│                          │
+│  └────────────────────────────┘                          │
+│       │                                                  │
+│       ▼  (every 5–10 min OR end of order)                │
+│  Compressed Transmission to Server                       │
+│  {                                                       │
+│    "worker_id": "uuid",                                  │
+│    "ward_time": {                                        │
+│      "ward_Adyar": 1200,                                 │
+│      "ward_Mylapore": 800,                               │
+│      "ward_Velachery": 300                               │
+│    }                                                     │
+│  }                                                       │
+│       │                                                  │
+│  Order Completed → Tracking stops                        │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -585,7 +419,7 @@ Payout is not all-or-nothing. It compensates for what the worker **would have ea
 
 ```
 disrupted_expected = (disruption_hours / total_working_hours) × EDE
-floor              = 0.5 × disrupted_expected
+floor              = 0.5 × disrupted_expected
 ```
 
 | Scenario | Payout Formula |
@@ -597,12 +431,12 @@ floor              = 0.5 × disrupted_expected
 ### Example
 
 ```
-EDE                  = ₹800
-Disruption duration  = 6 hours
-Total working hours  = 8 hours
+EDE                  = ₹800
+Disruption duration  = 6 hours
+Total working hours  = 8 hours
 
-disrupted_expected   = (6 / 8) × 800 = ₹600
-floor                = 0.5 × 600     = ₹300
+disrupted_expected   = (6 / 8) × 800 = ₹600
+floor                = 0.5 × 600     = ₹300
 ```
 
 | Scenario | Calculation | Total Income |
@@ -629,7 +463,7 @@ floor                = 0.5 × 600     = ₹300
 
 ## Loyalty Bonus — Chit Fund Model
 
-Workers who pay continuously for **12 weeks (3 months)** never truly "lose" their premiums.
+Workers who pay continuously for **24 weeks (6 months)** never truly "lose" their premiums.
 
 | Scenario | Premium Return |
 |---|---|
@@ -640,7 +474,7 @@ Workers who pay continuously for **12 weeks (3 months)** never truly "lose" thei
 - Missed weekly payment → counter resets to zero
 - Any payout received during the term → counter resets to zero
 
-Only an unbroken 12-week streak qualifies. A 48-hour grace period applies after the policy term ends (for settlement processing only — not for coverage extension).
+Only an unbroken 24-week streak qualifies. A 48-hour grace period applies after the policy term ends (for settlement processing only — not for coverage extension).
 
 Settlement is triggered automatically and paid via UPI.
 
@@ -676,7 +510,7 @@ Premiums collected from active workers are pooled at the zone level to fund auto
 | **Diversification** | Risk spread across workers in different wards within each city zone |
 | **Reserve Buffer** | 15% of each premium retained as a contingency reserve (the 1.15 loading factor in the formula) |
 | **Reinsurance** | Reinsurance layer planned at scale to protect against catastrophic multi-city events (e.g., national floods) |
-| **Return Flow** | Undrawn reserves after 12-week chit cycle returned to eligible workers as Loyalty Bonus |
+| **Return Flow** | Undrawn reserves after 24-week chit cycle returned to eligible workers as Loyalty Bonus |
 
 ---
 
@@ -801,265 +635,45 @@ Based on a cohort of gig delivery workers in Chennai and Bengaluru:
 - Weekly premium model aligned with IRDAI microinsurance guidelines
 - Data handling compliant with DPDP Act 2023
 - Standard exclusions (war, pandemic, terrorism, nuclear events) documented in the formal policy wording
-=======
-A hard boolean check covering:
-- Was the policy bought **before** the event was publicly announced?
-- Is the worker outside the 6-hour refractory window for spontaneous events?
-- Is the event outside the 72-hour known-event exclusion window?
-
-**Pass condition:** AEC = TRUE
-
----
-
-No action required from the worker. The system runs daily and checks for disruptions automatically.
-
-```
-Gate 1 → DVS ≥ 0.70   (Was the disruption real?)
-Gate 2 → ZPCS ≥ 0.35  (Was it zone-wide?)
-Gate 3 → AEC = TRUE   (Was the event covered?)
-
-All 3 pass → payout formula runs → UPI transfer
-```
-
-Payout is triggered and released only once the disruption parameter that caused Gate 1 to pass returns to normal (back below threshold) and the insurance ends.
-
----
-
-### Gate 4 — Anti-Spoofing & Fraud Detection (WAS)
-### Problem & Approach
-
-GPS spoofing is a major challenge in disruption-based insurance systems, where users may fake their location to appear inside a high-risk zone and trigger payouts.
-
-To address this, InFin moves beyond rule-based validation and introduces a machine learning–driven scoring system called the Worker Authenticity Score (WAS).
-
-Instead of relying on a single signal like GPS, WAS models each worker as a time-series of behavioral signals and performs anomaly detection across multiple independent dimensions. This makes the system robust against manipulation, as real-world behavior is significantly harder to fake than location data.
-
-### Worker Authenticity Score (WAS)
-
-WAS is computed as a weighted combination of multiple behavioral signals:
-```
-WAS = f(mobility_pattern, peer_consistency, network_behavior, platform_activity)
-```
-
-Each component is modeled using statistical learning and anomaly detection techniques. Even if one signal is spoofed, the overall system remains reliable.
-
-### Core Detection Layers (ML-Based)
-
-#### Mobility Pattern Analysis
-
-- Processes continuous GPS trajectories as sequential data
-- Evaluates:
-  - Speed consistency
-  - Route alignment
-  - Trajectory continuity
-- Detects impossible movements such as teleportation or synthetic paths
-
-#### Peer Consistency Modeling
-
-- Compares worker behavior with others in the same zone
-- Uses clustering and similarity scoring
-- Detects coordinated fraud patterns across multiple accounts
-
-#### Network Behavior Modeling
-
-- Models cell tower transitions and signal variance
-- Real-world networks show noisy, irregular patterns
-- Flags artificially stable signals typical of spoofed environments
-
-#### Platform Activity Modeling
-
-- Builds baseline profiles using historical delivery data
-- Tracks:
-  - Order acceptance rates
-  - Completion times
-  - Activity density
-- Detects unnatural inactivity during disruptions
-
-### Model Ensemble & Weighting
-
-The final WAS is computed using a weighted ensemble:
-
-- Mobility Pattern → 35%
-- Peer Consistency → 25%
-- Network Behavior → 20%
-- Platform Activity → 20%
-
-This ensures balanced decision-making across independent behavioral signals.
-
-### Decision System
-
-Instead of binary approval, WAS feeds into a three-stage decision engine:
-
-🟢 **Approved**
-- High authenticity score
-- Instant payout
-
-🟡 **Flagged**
-- Suspicious but not conclusive
-- Payout delayed (not denied)
-- Re-evaluated with additional data
-
-🔴 **Blocked**
-- Strong anomaly signals
-- Claim sent for audit and further verification
-
-### Continuous Learning
-
-The WAS model continuously improves over time by learning from new behavioral data and fraud patterns. This allows the system to adapt to evolving spoofing techniques while maintaining fairness for genuine workers.
-
-#### Why This Works
-
-Fraudsters may spoof GPS location, but cannot easily replicate:
-
-- Real movement trajectories
-- Noisy network behavior
-- Consistent delivery patterns
-- Peer-aligned activity
-
-By combining these signals, InFin ensures strong fraud resistance without penalizing genuine users.
-
-## Smart Payout Logic
-
-Payout is not all-or-nothing. It compensates for what the worker **would have earned** during the disruption minus what they **actually earned**, while ensuring a minimum income floor.
-
----
-
-### Core Logic
-
-- **Expected Earnings (E)** = average of previous earnings  
-- **Disruption Duration (D)** = hours of disruption  
-- **Total Working Hours (T)** = Workers working window 
-
-
-disrupted_expected = (D / T) × E
-floor = 0.5 × disrupted_expected
-
-
----
-
-### Payout Rules
-
-| Scenario | Payout |
-|---|---|
-| Worker didn't work | `floor` |
-| Worked but earned below floor | `(floor − actual_earned) + (0.1 × floor)` |
-| Worked and earned above floor | ₹0 (already protected) |
-
----
-
-### Example
-
-- Expected (E) = ₹800  
-- Disruption = 6 hours  
-- Total working hours = 8  
-
-
-disrupted_expected = (6 / 8) × 800 = ₹600
-floor = 0.5 × 600 = ₹300
-
-
----
-
-**Worker stays home:**
-
-Payout = ₹300
-Total income = ₹300
-
-
----
-
-**Worker earns ₹100:**
-
-Payout = (300 − 100) + (0.1 × 300)
-= 200 + 30
-= ₹230
-
-Total income = 100 + 230 = ₹330
-
-
----
-
-### Key Outcome
-
-- Worker at home → ₹300  
-- Worker who tries → ₹330  
-
-Effort is rewarded  
-Core payout logic remains unchanged  
-Simple additive incentive  
-
----
-
----
-
-## Anti-Gaming Rules
-
-| Event Type | Exclusion Rule |
-|---|---|
-| **Bandh / Strike** | Policy bought after public announcement of the bandh date is excluded for that event |
-| **Cyclone** | Policy bought after IMD orange alert issuance is excluded for that cyclone |
-| **Flood** | ML model predicts affected zones and days; policies bought after flood risk is confirmed are excluded for those specific dates and pincodes |
-| **Spontaneous events** (riots, road closures, Section 144) | 6-hour refractory period — must be a policyholder at least 6 hours before the event started |
-| **Known-event window** | If the disruption was already in the alert snapshot at subscription time and current time is within 72 hours of subscription, the claim is excluded |
-
----
-
-## Loyalty Bonus — Chit Fund Model
-
-Workers who pay continuously for 24 weeks (6 months) never truly "lose" their premiums.
-
-| Scenario | Premium Return |
-|---|---|
-| No claims filed during full term | **80–90%** returned |
-| Claims made during term | **10–20%** returned, scaled by claim frequency |
-
-**Loyalty counter reset rules:**
-- If a worker misses a weekly payment OR claims a payout during the term, the cumulative premium sum and transaction count reset to zero.
-- Only an unbroken 24-week streak qualifies for the end-of-term settlement.
-- A static 48 hr is given as a relaxation period after the insurance policy ends.
-
-Settlement is triggered automatically upon plan completion and paid via UPI.
->>>>>>> main
 
 ---
 
 ## End-to-End Claim Flow
 
 ```
-<<<<<<< phase-3
 External API detects disruption (weather / IMD / AQI)
-                    │
-                    ▼
-        ┌──────────────────────┐
-        │  Gate 1: DVS ≥ 0.70  │ ──FAIL──► Rejected + WhatsApp notify
-        └──────────┬───────────┘
-                   │ PASS
-                   ▼
-        ┌──────────────────────┐
-        │  Gate 2: ZPCS ≥ 0.35 │ ──FAIL──► Rejected + WhatsApp notify
-        └──────────┬───────────┘
-                   │ PASS
-                   ▼
-        ┌──────────────────────┐
-        │  Gate 3: AEC = TRUE  │ ──FAIL──► Rejected + WhatsApp notify
-        └──────────┬───────────┘
-                   │ PASS
-                   ▼
-        ┌──────────────────────┐
-        │  Gate 4: WAS score   │ ──🔴──► Blocked → Audit
-        └──────────┬───────────┘
-          🟢 PASS  │  🟡 Flagged → Delayed, re-evaluated
-                   ▼
-        Disruption parameter returns to normal
-                   │
-                   ▼
-        Payout formula computed
-                   │
-                   ▼
-        UPI transfer to worker
-                   │
-                   ▼
-        WhatsApp confirmation sent
+                    │
+                    ▼
+        ┌──────────────────────┐
+        │  Gate 1: DVS ≥ 0.70  │ ──FAIL──► Rejected + WhatsApp notify
+        └──────────┬───────────┘
+                   │ PASS
+                   ▼
+        ┌──────────────────────┐
+        │  Gate 2: ZPCS ≥ 0.35 │ ──FAIL──► Rejected + WhatsApp notify
+        └──────────┬───────────┘
+                   │ PASS
+                   ▼
+        ┌──────────────────────┐
+        │  Gate 3: AEC = TRUE  │ ──FAIL──► Rejected + WhatsApp notify
+        └──────────┬───────────┘
+                   │ PASS
+                   ▼
+        ┌──────────────────────┐
+        │  Gate 4: WAS score   │ ──🔴──► Blocked → Audit
+        └──────────┬───────────┘
+          🟢 PASS  │  🟡 Flagged → Delayed, re-evaluated
+                   ▼
+        Disruption parameter returns to normal
+                   │
+                   ▼
+        Payout formula computed
+                   │
+                   ▼
+        UPI transfer to worker
+                   │
+                   ▼
+        WhatsApp confirmation sent
 ```
 
 All steps are fully automated. The worker receives a payout without ever opening the InFin app.
@@ -1080,75 +694,41 @@ The policy covers:
 - Fraud and misrepresentation exclusions
 - 4-Gate claim validation process
 - Benefit calculation formulas
-- Chit Fund Loyalty Bonus terms (12-week cycle)
+- Chit Fund Loyalty Bonus terms
 - Policyholder obligations
 - Data privacy (DPDP Act 2023)
 - Dispute resolution and grievance mechanism
 - Governing law (IRDAI, Chennai jurisdiction)
-=======
-External API detects disruption
-        ↓
-Gate 1: DVS computed
-        ↓ (pass)
-Gate 2: ZPCS computed
-        ↓ (pass)
-Gate 3: AEC verified
-        ↓ (pass)
-Disruption parameter returns to normal
-        ↓
-Payout calculated
-        ↓
-UPI transfer to worker
-        ↓
-WhatsApp notification sent
-```
-
-All steps are fully automated. Workers are notified via WhatsApp at each stage.
->>>>>>> main
 
 ---
 
 ## Database Schema
 
-<<<<<<< phase-3
 Built on **Supabase (Postgres + Auth + Realtime)**.
-=======
-Built on **Supabase (Postgres)**.
->>>>>>> main
 
 ### `workers`
 | Column | Type | Notes |
 |---|---|---|
 | `id` | uuid (PK) | |
-<<<<<<< phase-3
 | `phone` | text | OTP-verified |
 | `platform` | text | Swiggy / Zomato / Amazon etc. |
 | `city` | text | |
 | `pincode` | text | Insured Zone key |
 | `expected_daily_earnings` | numeric | Updated weekly via ML model |
 | `disruption_probability` | numeric | Rolling 1-year window |
-=======
-| `phone` | text | |
-| `platform` | text | Swiggy / Zomato |
-| `city` | text | |
-| `pincode` | text | Zone key |
-| `expected_daily_earnings` | numeric | Updated per order in real time |
-| `disruption_probability` | numeric | Updated per disrupted day over rolling 1-year window |
->>>>>>> main
 
 ### `policies`
 | Column | Type | Notes |
 |---|---|---|
 | `id` | uuid (PK) | |
 | `worker_id` | uuid (FK → workers) | |
-<<<<<<< phase-3
 | `weekly_premium` | numeric | Sigmoid-scaled, ≤ ₹100 |
 | `status` | text | active / expired / cancelled |
 | `plan_duration_months` | int | 3 or 6 |
-| `coverage_start_at` | timestamptz | |
+| `subscribed_at` | timestamptz | |
 | `next_due_date` | timestamptz | |
 
-### `worker_ward_affinity`
+### `ward_affinity`
 | Column | Type | Notes |
 |---|---|---|
 | `id` | uuid (PK) | |
@@ -1158,14 +738,6 @@ Built on **Supabase (Postgres)**.
 | `session_date` | date | |
 | `updated_at` | timestamptz | |
 
-=======
-| `weekly_premium` | numeric | |
-| `status` | text | active / expired / cancelled |
-| `plan_duration_months` | int | 3 or 6 |
-| `subscribed_at` | timestamptz | |
-| `next_due_date` | timestamptz | |
-
->>>>>>> main
 ### `zone_disruption_events`
 | Column | Type | Notes |
 |---|---|---|
@@ -1179,11 +751,7 @@ Built on **Supabase (Postgres)**.
 | `is_announced` | boolean | |
 | `is_spontaneous` | boolean | |
 
-<<<<<<< phase-3
-### `peer_activity`
-=======
 ### `peer_activity_snapshots`
->>>>>>> main
 | Column | Type | Notes |
 |---|---|---|
 | `event_id` | uuid (FK) | |
@@ -1201,18 +769,11 @@ Built on **Supabase (Postgres)**.
 | `dvs_passed` | boolean | |
 | `zpcs_passed` | boolean | |
 | `aec_passed` | boolean | |
-<<<<<<< phase-3
 | `was_status` | text | approved / flagged / blocked |
 | `was_score` | numeric | |
 | `floor_amount` | numeric | |
 | `actual_earned` | numeric | |
 | `final_payout` | numeric | |
-=======
-| `floor_amount` | numeric | |
-| `actual_earned` | numeric | |
-| `final_payout` | numeric | |
-| `weekly_cap_remaining` | numeric | |
->>>>>>> main
 | `status` | text | pending / approved / paid |
 | `paid_at` | timestamptz | |
 
@@ -1228,106 +789,59 @@ Built on **Supabase (Postgres)**.
 
 ---
 
-<<<<<<< phase-3
 ## Use Case Diagram
 
 ```mermaid
 graph LR
-    subgraph Primary_Actor [Primary Actor]
-        Worker((Gig Worker))
-    end
+    subgraph Primary_Actor [Primary Actor]
+        Worker((Gig Worker))
+    end
 
-    subgraph InFin_System [InFin: Income Protection System]
-        UC1(Link Platform & Forecast Earnings)
-        UC2(Subscribe to Policy via UPI/Razorpay)
-        UC3(Monitor Real-time Risk Dashboard)
-        UC4(Track Loyalty Bonus & Chit-fund)
-        UC5(Execute 4-Gate Claim Validation)
-=======
-## Use Case diagram
-```mermaid
-graph LR
-    %% Primary Actors on the Left
-    subgraph Primary_Actors [Primary Actor]
-        direction TB
-        Worker((Gig Worker))
-    end
+    subgraph InFin_System [InFin: Income Protection System]
+        UC1(Link Platform & Forecast Earnings)
+        UC2(Subscribe to Policy via UPI/Razorpay)
+        UC3(Monitor Real-time Risk Dashboard)
+        UC4(Track Loyalty Bonus & Chit-fund)
+        UC5(Execute 4-Gate Claim Validation)
+        UC6(Receive Automated Payouts)
+        UC7(Get WhatsApp Notifications)
+    end
 
-    %% InFin System Services in the Center Box
-    subgraph InFin_System [InFin: Income Protection System]
-        direction TB
-        UC1(Link Platform & Forecast Earnings)
-        UC2(Subscribe to Policy via UPI/Stripe)
-        UC3(Monitor Real-time Risk Dashboard)
-        UC4(Track Loyalty Bonus & Chit-fund)
-        UC5(Execute 3-Gate Claim Validation)
->>>>>>> main
-        UC6(Receive Automated Payouts)
-        UC7(Get WhatsApp Notifications)
-    end
+    subgraph Secondary_Actors [Secondary Actors / Systems]
+        Plat[Delivery Platforms\nSwiggy / Zomato]
+        Data[External Data\nWeather / IMD / AQI]
+        Pay[Financial APIs\nUPI / Razorpay]
+        Comms[Messaging\nTwilio / WATI]
+    end
 
-<<<<<<< phase-3
-    subgraph Secondary_Actors [Secondary Actors / Systems]
-        Plat[Delivery Platforms\nSwiggy / Zomato]
-        Data[External Data\nWeather / IMD / AQI]
-        Pay[Financial APIs\nUPI / Razorpay]
-        Comms[Messaging\nTwilio / WATI]
-    end
+    Worker --- UC1
+    Worker --- UC2
+    Worker --- UC3
+    Worker --- UC4
+    Worker --- UC6
+    Worker --- UC7
 
-=======
-    %% Secondary Actors on the Right
-    subgraph Secondary_Actors [Secondary Actors / Systems]
-        direction TB
-        Plat[Delivery Platforms<br/>Swiggy / Zomato]
-        Data[External Data<br/>Weather / IMD / AQI]
-        Pay[Financial APIs<br/>UPI / Stripe]
-        Comms[Messaging<br/>Twilio / WATI]
-    end
+    UC1 --- Plat
+    UC5 --- Data
+    UC2 --- Pay
+    UC6 --- Pay
+    UC7 --- Comms
 
-    %% Interactions: Worker to System
->>>>>>> main
-    Worker --- UC1
-    Worker --- UC2
-    Worker --- UC3
-    Worker --- UC4
-    Worker --- UC6
-    Worker --- UC7
-
-<<<<<<< phase-3
-=======
-    %% Interactions: System to Secondary Actors
->>>>>>> main
-    UC1 --- Plat
-    UC5 --- Data
-    UC2 --- Pay
-    UC6 --- Pay
-    UC7 --- Comms
-
-<<<<<<< phase-3
-    style InFin_System fill:#fdfdfd,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
-    style Primary_Actor fill:none,stroke:none
-    style Secondary_Actors fill:none,stroke:none
-    style UC5 fill:#fff4dd,stroke:#d4a017,font-weight:bold
+    style InFin_System fill:#fdfdfd,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
+    style Primary_Actor fill:none,stroke:none
+    style Secondary_Actors fill:none,stroke:none
+    style UC5 fill:#fff4dd,stroke:#d4a017,font-weight:bold
 ```
 
 ---
-=======
-    %% Styling for a Professional Look
-    style InFin_System fill:#fdfdfd,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
-    style Primary_Actors fill:none,stroke:none
-    style Secondary_Actors fill:none,stroke:none
-    style UC5 fill:#fff4dd,stroke:#d4a017,font-weight:bold
-```
->>>>>>> main
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-<<<<<<< phase-3
-| **Frontend** | React.js / VITE |
+| **Frontend** | Next.js (App Router) |
 | **Database** | Supabase (Postgres + Auth + Realtime) |
-| **Backend Logic** | Python / Flask API |
+| **Backend Logic** | Supabase Edge Functions |
 | **UI** | Tailwind CSS + shadcn/ui |
 | **Payments** | Razorpay (premium collection), UPI (payouts) |
 | **Notifications** | WhatsApp via Twilio / WATI |
@@ -1338,25 +852,11 @@ graph LR
 | **Fraud Detection** | Custom WAS ensemble model |
 | **Premium Model** | Exponential Smoothing + Sigmoid scaling |
 
-Note: For the prototype purpose only, some of the API's are not being used - instead synthetic data is put to usage.
-=======
-| **Frontend** | Next.js (App Router) |
-| **Database** | Supabase (Postgres + Auth + Realtime) |
-| **Backend logic** | Supabase Edge Functions |
-| **UI** | Tailwind CSS + shadcn/ui |
-| **Payments** | Stripe (premium collection), UPI (payouts) |
-| **Notifications** | WhatsApp via Twilio / WATI |
-| **Weather & AQI** | External weather and AQI APIs |
-| **Flood prediction** | Custom ML model (zone + date level) |
-| **Disaster alerts** | IMD Alert APIs |
-
 ---
->>>>>>> main
 
 ## Product Screens
 
 ### Worker Dashboard
-<<<<<<< phase-3
 Active policy card, sigmoid-computed weekly premium, weekly cap remaining, live zone disruption alert banner (Supabase Realtime), and recent claims feed showing gate-by-gate pass/fail results.
 
 ### Claim Detail Modal
@@ -1397,69 +897,11 @@ InFin provides a dedicated support channel for all worker queries. While the pla
 Support covers: policy subscription, premium queries, claim validation results, loyalty bonus settlement, and account/technical issues.
 
 ---
-=======
-Active policy card, weekly cap remaining, live zone disruption alert banner (Supabase Realtime), and recent claims feed showing gate-by-gate pass/fail results.
-
-### Claim Detail Modal
-DVS gauge breakdown, ZPCS peer count visualization, AEC pass/fail with plain-language reason, Anti-spoofing step-by-step payout math.
-
-### Policy Subscription (3 steps)
-1. Phone OTP verification
-2. Platform account link + earnings fetch
-3. Plan selection (3 or 6 months) with loyalty return preview → UPI payment confirm
-
-### Loyalty Tracker
-Progress bar, total premiums paid, live return projection for zero-claim vs claim scenarios, countdown to settlement date.
-
-### Admin / Ops Panel
-All disruption events with gate scores, claims pipeline (pending → approved → paid), zone heatmap by pincode, manual override with audit log.
-
----
-
-## Support & Assistance
-
-To ensure transparency and user trust, InFin provides a dedicated support channel for workers to reach out in case of any issues or queries.
-
-While the platform is designed to be fully automated — from disruption detection to claim payouts — we understand that users may still need assistance in certain scenarios.
-
-### Contact Feature
-
-Users can directly contact the InFin support team through:
-
-- Email: support@infin.com
-- Phone: 1111-4444-3333
-
-This feature is accessible within the product interface, allowing workers to quickly raise concerns related to:
-
-- Policy subscription or payment issues
-- Claim validation or payout discrepancies
-- Loyalty bonus and settlement queries
-- Account or technical support
-
-### Why This Matters
-
-- Builds user trust in an automated insurance system
-- Provides a fallback mechanism when automation is unclear
-- Ensures human support for edge cases and disputes
-
-Even though InFin minimizes manual intervention, this feature ensures that users are never left without support.
-
-### UI Screenshots
-<img width="1906" height="903" alt="image" src="https://github.com/user-attachments/assets/f0459168-e26d-44de-9e82-f4d4cc2aa11e" />
-<img width="684" height="800" alt="image" src="https://github.com/user-attachments/assets/8656b666-a701-424a-afd4-3e50536af6e2" />
-<img width="1010" height="806" alt="image" src="https://github.com/user-attachments/assets/ace85e81-0bc7-429c-9927-d791329c1c81" />
-<img width="1063" height="797" alt="image" src="https://github.com/user-attachments/assets/dbeec07e-b904-4569-959e-370a6801e339" />
-<img width="1330" height="816" alt="image" src="https://github.com/user-attachments/assets/3fc49d6f-ee20-4f85-8c54-df40154064e0" />
-<img width="1085" height="806" alt="image" src="https://github.com/user-attachments/assets/bde1c201-186b-4aa7-a4c4-f855a00c24c2" />
-
-
->>>>>>> main
 
 ## Getting Started
 
 ```bash
 # Clone the repo
-<<<<<<< phase-3
 git clone https://github.com/KasiramSayee/Infin.git
 cd infin
 
@@ -1469,11 +911,11 @@ npm install
 # Set up environment variables
 cp .env.example .env.local
 # Fill in:
-#   VITE_RAZORPAY_KEY_ID
-#   RAZORPAY_KEY_ID
-#   RAZORPAY_KEY_SECRET
-#   TWILIO_ACCOUNT_SID
-#   TWILIO_AUTH_TOKEN
+#   VITE_RAZORPAY_KEY_ID
+#   RAZORPAY_KEY_ID
+#   RAZORPAY_KEY_SECRET
+#   TWILIO_ACCOUNT_SID
+#   TWILIO_AUTH_TOKEN
 
 # Run database migrations
 npx supabase db push
@@ -1506,32 +948,3 @@ The result is a system where **honesty is the optimal strategy** — for workers
 
 *InFin — Protecting the income of India's gig workers.*
 *Policy Form INFIN-IPP-2026-01 | Designed in alignment with IRDAI Sandbox Framework*
-=======
-git clone https://github.com/KasiramSayee/Guideware.git
-cd infin
-```
-
-```bash
-# Install dependencies
-npm install
-```
-
-```bash
-# Set up environment variables
-cp .env.example .env.local
-# Fill in: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
-#          STRIPE_SECRET_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
-
-# Run database migrations
-npx supabase db push
-```
-
-```bash
-# Start development server
-npm run dev
-```
-
----
-
-
->>>>>>> main
