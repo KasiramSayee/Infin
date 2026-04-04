@@ -37,11 +37,20 @@
 
 ## Abstract
 
-InFin uses real-time external data and behavioural analytics to detect disruption events and autonomously process claims without user intervention. The system employs a multi-stage validation pipeline — **Disruption Validity Score (DVS)**, **Zone Peer Comparison Score (ZPCS)**, **Activation Eligibility Check (AEC)**, and **Worker Authenticity Score (WAS)** — to ensure accurate, fraud-resistant claim verification.
+InFin is a parametric income protection ecosystem designed for India’s gig economy, providing an automated safety net for delivery partners against hyper-local disruptions like floods, heatwaves, and strikes. To ensure long-term sustainability and worker trust, InFin operates on a Hybrid Insurance-Chit Fund Model: workers who maintain a 24-week claim-free streak recover up to 90% of their premiums, turning protection into a low-risk savings habit.
 
-Personalised premiums are dynamically computed using a **sigmoid-scaled ML model** based on predicted earnings and regional risk. To improve trust and affordability, InFin introduces a **hybrid insurance + chit-fund model**, where consistent users recover a significant portion of their premiums if no claims are made.
+The system is powered by two proprietary engines:
 
-By combining automated event detection, data-driven validation, and instant UPI payouts, InFin delivers a scalable, worker-friendly alternative to traditional insurance.
+Engine 1 (Policy Pay): Uses a time-series ML model to forecast earnings, applying a Sigmoid-scaled premium formula that dynamically adjusts risk while strictly capping weekly costs at ₹100 to ensure affordability for low-income earners.
+
+Engine 2 (Policy Claim): A 4-Gate validation pipeline that has evolved from broad city-level monitoring to hyper-local Ward-Based Analysis.
+
+### Core Innovations
+- Ward Affinity & Compensation Logic: The system identifies a worker's "Prime Ward" through historical data. If a disruption occurs, InFin calculates if the worker could have reasonably compensated for lost earnings by moving to an adjacent, unaffected "Best Ward." Payouts are triggered only when regional disruption makes such compensation impossible.
+
+- Gate 4: Anti-Spoofing via Cell Tower Triangulation: To combat GPS spoofing, InFin introduces a hardware-level validation layer. The system pulls Cell Tower IDs and signal strength via the Android API, performs an OpenCellID lookup, and cross-checks this physical network location against the user’s claimed Ward coordinates.
+
+- Smart Payouts & Anti-Gaming: Includes a Smart Payout Logic that guarantees an income floor and Anti-Gaming Rules (e.g., 6-hour refractory periods) to prevent "on-demand" policy purchases during active disasters.
 
 ---
 
