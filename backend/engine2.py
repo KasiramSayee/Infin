@@ -226,7 +226,6 @@ async def evaluate_claims(simulated_time: Optional[str] = Query(None, descriptio
         # -------------------------------------------------------------
         # PHASE 2: PENDING -> LAPSED (Finalize Claim & Payout)
         # -------------------------------------------------------------
-        # For prototype simplicity, assuming Disruption Ending unlocks Phase 2
         pending_policies = supabase.table("policies").select("id, worker_id").eq("status", "pending").execute()
         
         for policy in pending_policies.data:
@@ -235,24 +234,51 @@ async def evaluate_claims(simulated_time: Optional[str] = Query(None, descriptio
                 continue
             claim = claim_res.data[0]
             
-            # Check if all events are now resolved and find disruption timespan
-            all_resolved = True
+            # 1. Determine Disruption Wards and Start Time
+            disrupted_wards = []
             earliest_start = None
+            
             for ev_id in claim.get('disruption_event_ids', []):
-                ev_check = supabase.table("zone_disruption_events").select("is_active, created_at").eq("id", ev_id).execute()
-                if ev_check.data:
-                    ev = ev_check.data[0]
-                    if ev.get('is_active'):
-                        all_resolved = False
-                        break
-                    e_start = datetime.fromisoformat(ev['created_at'].replace('Z', '+00:00'))
-                    if earliest_start is None or e_start < earliest_start:
-                        earliest_start = e_start
-                        
-            if all_resolved and earliest_start:
-                # Disruption ended -> Gate 5 Payout
+                ev_res = supabase.table("zone_disruption_events").select("ward_id, created_at").eq("id", ev_id).execute()
+                if ev_res.data:
+                    ward = ev_res.data[0].get('ward_id')
+                    ev_start = datetime.fromisoformat(str(ev_res.data[0].get('created_at')).replace('Z', '+00:00'))
+                    if not ev_start.tzinfo:
+                        ev_start = ev_start.replace(tzinfo=timezone.utc)
+                    if ward not in disrupted_wards:
+                        disrupted_wards.append(ward)
+                    if earliest_start is None or ev_start < earliest_start:
+                        earliest_start = ev_start
+            
+            if not disrupted_wards or not earliest_start:
+                continue
+
+            # 2. Check if all disrupted wards have resolved
+            all_resolved = True
+            for ward in disrupted_wards:
+                # Check the latest event for this ward
+                latest_ev_res = supabase.table("zone_disruption_events").select("is_active").eq("ward_id", ward).lte("created_at", now.isoformat()).order("created_at", desc=True).limit(1).execute()
+                if latest_ev_res.data and latest_ev_res.data[0].get('is_active'):
+                    all_resolved = False
+                    break
+                    
+            if all_resolved:
                 print(f"[Engine 2 Phase 2] Disruption ended for policy {policy['id']}. Evaluating Gate 5...")
                 
+                # 3. Calculate metrics using Phase 4's Duration Logic
+                # Max duration of 24 hours to avoid runaway expected claims if logic breaks
+                duration_hours = min(24.0, (now - earliest_start).total_seconds() / 3600.0)
+                if duration_hours <= 0:
+                    duration_hours = 1.0 # Minimum 1 hour
+                
+                expected_daily = claim.get('expected_daily', 800)
+                floor_amount = claim.get('floor_amount', 0)
+                
+                # Assume 10 working hours per day. So 1 hour = expected_daily / 10
+                expected_period_earnings = expected_daily * (duration_hours / 10.0)
+                if expected_period_earnings > expected_daily:
+                    expected_period_earnings = expected_daily
+                    
                 # Fetch actual earned during the exact bounds of the disruption
                 worker_id = policy['worker_id']
                 start_iso = earliest_start.isoformat()
@@ -261,21 +287,23 @@ async def evaluate_claims(simulated_time: Optional[str] = Query(None, descriptio
                 orders_res = supabase.table("worker_orders").select("earning").eq("worker_id", worker_id).gte("created_at", start_iso).lte("created_at", end_iso).execute()
                 actual_earned = sum(order.get('earning', 0) for order in orders_res.data) if orders_res.data else 0
                 
-                expected_daily = claim['expected_daily']
-                floor_amount = claim.get('floor_amount', 0)
+                print(f"[Engine 2 Phase 2] Duration: {duration_hours:.2f}h, Expected: Rs.{expected_period_earnings:.2f}, Actual: Rs.{actual_earned}")
+
+                # 4. Gate 5 Logic Combined
+                GATE5_PERCENTAGE_THRESHOLD = 0.75
                 final_payout = 0
                 
-                GATE5_PERCENTAGE_THRESHOLD = 0.75
-                
-                # GATE 5 logic: 
-                # If they earned more than 75% of expected, they are filtered out
-                if actual_earned > (GATE5_PERCENTAGE_THRESHOLD * expected_daily):
+                # Phase-3 uses 75% limit on the new Phase-4 expected earnings calculation
+                if actual_earned >= (GATE5_PERCENTAGE_THRESHOLD * expected_period_earnings):
                     final_claim_status = "rejected"
-                    print(f"  -> GATE 5 REJECTED: Worker earned {actual_earned} which is > {GATE5_PERCENTAGE_THRESHOLD*100}% of expected {expected_daily}")
+                    print(f"  -> GATE 5 REJECTED: Worker earned {actual_earned} which is >= {GATE5_PERCENTAGE_THRESHOLD*100}% of expected {expected_period_earnings:.2f}")
                 else:
                     final_claim_status = "approved"
-                    gap = expected_daily - actual_earned
-                    final_payout = max(int(gap), int(floor_amount)) # ensure payout covers minimum floor promise
+                    gap = expected_period_earnings - actual_earned
+                    # Phase-3 floor-amount protection equation
+                    final_payout = max(int(gap), int(floor_amount))
+                    if final_payout < 0:
+                        final_payout = 0
                     print(f"  -> GATE 5 APPROVED: Worker earned {actual_earned}. Gap: {gap}. Final Payout (with floor {floor_amount}): {final_payout}")
                 
                 supabase.table("claims").update({
@@ -285,7 +313,7 @@ async def evaluate_claims(simulated_time: Optional[str] = Query(None, descriptio
                     "paid_at": now.isoformat() if final_claim_status == "approved" else None
                 }).eq("id", claim['id']).execute()
                 
-                # If approved, reset cumulative weeks natively
+                # 5. Update Policy State
                 if final_claim_status == "approved":
                     supabase.table("policies").update({
                         "status": "lapsed",
