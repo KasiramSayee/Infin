@@ -235,29 +235,48 @@ async def evaluate_claims(simulated_time: Optional[str] = Query(None, descriptio
                 continue
             claim = claim_res.data[0]
             
-            # Check if all events are now resolved
+            # Check if all events are now resolved and find disruption timespan
             all_resolved = True
+            earliest_start = None
             for ev_id in claim.get('disruption_event_ids', []):
-                ev_check = supabase.table("zone_disruption_events").select("is_active").eq("id", ev_id).execute()
-                if ev_check.data and ev_check.data[0].get('is_active'):
-                    all_resolved = False
-                    break
-                    
-            if all_resolved:
+                ev_check = supabase.table("zone_disruption_events").select("is_active, created_at").eq("id", ev_id).execute()
+                if ev_check.data:
+                    ev = ev_check.data[0]
+                    if ev.get('is_active'):
+                        all_resolved = False
+                        break
+                    e_start = datetime.fromisoformat(ev['created_at'].replace('Z', '+00:00'))
+                    if earliest_start is None or e_start < earliest_start:
+                        earliest_start = e_start
+                        
+            if all_resolved and earliest_start:
                 # Disruption ended -> Gate 5 Payout
-                print(f"[Engine 2 Phase 2] Disruption ended for policy {policy['id']}.")
+                print(f"[Engine 2 Phase 2] Disruption ended for policy {policy['id']}. Evaluating Gate 5...")
                 
-                # Fetch actual earned on the day of disruption
-                # We could sum earnings from 'worker_orders' during the disruption period here
-                actual_earned = 0 # Simulated for now
+                # Fetch actual earned during the exact bounds of the disruption
+                worker_id = policy['worker_id']
+                start_iso = earliest_start.isoformat()
+                end_iso = now.isoformat()
+                
+                orders_res = supabase.table("worker_orders").select("earning").eq("worker_id", worker_id).gte("created_at", start_iso).lte("created_at", end_iso).execute()
+                actual_earned = sum(order.get('earning', 0) for order in orders_res.data) if orders_res.data else 0
+                
                 expected_daily = claim['expected_daily']
+                floor_amount = claim.get('floor_amount', 0)
                 final_payout = 0
                 
-                if actual_earned > (0.5 * expected_daily):
+                GATE5_PERCENTAGE_THRESHOLD = 0.75
+                
+                # GATE 5 logic: 
+                # If they earned more than 75% of expected, they are filtered out
+                if actual_earned > (GATE5_PERCENTAGE_THRESHOLD * expected_daily):
                     final_claim_status = "rejected"
+                    print(f"  -> GATE 5 REJECTED: Worker earned {actual_earned} which is > {GATE5_PERCENTAGE_THRESHOLD*100}% of expected {expected_daily}")
                 else:
                     final_claim_status = "approved"
-                    final_payout = int(expected_daily - actual_earned)
+                    gap = expected_daily - actual_earned
+                    final_payout = max(int(gap), int(floor_amount)) # ensure payout covers minimum floor promise
+                    print(f"  -> GATE 5 APPROVED: Worker earned {actual_earned}. Gap: {gap}. Final Payout (with floor {floor_amount}): {final_payout}")
                 
                 supabase.table("claims").update({
                     "actual_earned": actual_earned,
