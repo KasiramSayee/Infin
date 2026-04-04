@@ -47,6 +47,9 @@ Engine 2 (Policy Claim): A 4-Gate validation pipeline that has evolved from broa
 
 - Smart Payouts & Anti-Gaming: Includes a Smart Payout Logic that guarantees an income floor and Anti-Gaming Rules (e.g., 6-hour refractory periods) to prevent "on-demand" policy purchases during active disasters.
 
+  ![WhatsApp Image 2026-04-04 at 22 01 43](https://github.com/user-attachments/assets/c90ea50c-d6bc-4221-8eb5-72fab305077c)
+
+
 ---
 
 ## Problem
