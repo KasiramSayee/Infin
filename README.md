@@ -109,39 +109,7 @@ We use **Exponential Smoothing** trained on a rolling 4-week window:
 
 ---
 
-### Sigmoid Premium Scaling
-
-To ensure premiums stay **at or below ₹100** and scale fairly across income levels, InFin uses a sigmoid function that maps raw predicted premiums to a bounded [₹20, ₹100] range.
-
-```
-premium = 100 / (1 + e^(-k × (EDE - midpoint)))
-```
-
-Where:
-- `EDE` = Expected Daily Earnings (ML output)
-- `midpoint` = ₹850 (median daily earnings in the cohort)
-- `k` = tunable steepness parameter (controls rate of increase)
-
-**Why sigmoid?**
-
-The S-curve mirrors how risk sensitivity actually behaves:
-- Low earners (≤ ₹600/day) pay near the floor — affordability protected
-- Middle earners (₹700–₹1,000/day) see premium grow steadily
-- High earners (≥ ₹1,200/day) approach ₹100 but never exceed it
-- Naturally bounded — no hard cap logic needed; the math handles it
-
-**Behaviour at key income levels (k = 0.005):**
-
-| Expected Daily Earnings | Premium |
-|---|---|
-| ₹400/day | ~₹22 |
-| ₹600/day | ~₹32 |
-| ₹850/day (median) | ~₹50 |
-| ₹1,100/day | ~₹73 |
-| ₹1,400/day | ~₹91 |
-| ₹1,800/day | ~₹99 |
-
-The sigmoid output feeds into the full premium formula:
+The full premium formula applies the sigmoid to the **risk-adjusted raw premium** (not directly to EDE), ensuring the S-curve operates in a consistent, bounded domain:
 
 ```
 raw_premium = EDE × disruption_probability × conflict_ratio × 1.15 / 0.65
@@ -154,6 +122,8 @@ weekly_premium = ROUND(
 ```
 conflict_ratio = workers_paid_past_4_weeks / workers_who_claimed
 ```
+
+> **Intuition:** Represents claim pressure in the system. When more workers claim than contribute, the ratio rises — increasing premiums to maintain pool solvency. A healthy system has `conflict_ratio` close to 1.
 
 ### Example — Rajan, Chennai
 
@@ -623,7 +593,7 @@ Based on a cohort of gig delivery workers in Chennai and Bengaluru:
 
 - Phone OTP verification at signup — no anonymous accounts
 - Gig Platform account linking verified against live platform records — cannot fake being a Swiggy/Zomato partner
-- KYC-lite: phone number + platform ID sufficient for low-ticket parametric insurance, consistent with IRDAI sandbox norms
+- Lightweight verification: phone number + platform ID, aligned with current sandbox assumptions for low-ticket parametric products (no full KYC required at this tier)
 - **One phone number = one policy** — prevents duplicate account creation
 
 ---
@@ -953,6 +923,26 @@ npx supabase db push
 # Start development server
 npm run dev
 ```
+
+
+---
+
+## What InFin Actually Is
+
+InFin is not simply an insurance system.
+
+> **InFin is a trust infrastructure for uncertain income systems.**
+
+It combines four disciplines into a single, automated pipeline:
+
+| Discipline | InFin Component |
+|---|---|
+| **Parametric Insurance** | Trigger-based payouts from external data; no claims filed by workers |
+| **Behavioural Modeling** | Ward Affinity System + WAS build a historical fingerprint of each worker |
+| **Distributed Fraud Detection** | Multi-layer, multi-signal gate architecture prevents any single point of spoofing |
+| **Incentive Design** | Chit Fund Loyalty Bonus aligns worker behaviour with long-term platform health |
+
+The result is a system where **honesty is the optimal strategy** — for workers, for the platform, and for the risk pool.
 
 ---
 
