@@ -70,6 +70,10 @@ Since gig platform APIs are not publicly accessible, workers can now upload thei
 
 > Phase 3 moved InFin from a conceptual system to a much more realistic, data-driven platform. By integrating real-time APIs, improving transparency through the dashboard, and enabling real user data input, InFin is now more accurate, more trustworthy, and much closer to real-world deployment.
 
+## Pitch Deck
+
+📊 **[Pitch Deck InFin](https://drive.google.com/file/d/1fJ0UqVgZmNLUnud5WSNEyr9X4IaTbd_T/view?usp=drive_link)**
+
 ---
 
 ## Table of Contents
